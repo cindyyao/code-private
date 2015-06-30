@@ -13,6 +13,8 @@ for j = 1:length(rho)
     norm = max(rho{j,1}')';
     norm = repmat(norm, 1, size(rho{j,1},2));
     rho{j,1} = rho{j,1}./norm;
-    [rho{j,1} theta{j,1}] = exciseRows(rho{j,1}, theta{j,1});
+%     [rho{j,1} theta{j,1}] = exciseRows(rho{j,1}, theta{j,1});
+    rho{j,1} = exciseRows(rho{j,1});
+
 end
 end

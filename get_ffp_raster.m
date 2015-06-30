@@ -5,7 +5,7 @@ trigger = zeros(1, n);
 for i = 1:n
     trigger(i) = datarun.triggers(4*(i-1)+1);
 end
-trigger = trigger - duration/2;
+% trigger = trigger - duration/2;
 
 raster = cell(length(cell_id), 1);
 raster_all = cell(length(cell_id), 1);

@@ -31,7 +31,7 @@ datarun{6} = load_stim(datarun{6}, 'user_defined_trigger_interval', 10);
 % datarun{7} = get_autocorrelations(datarun{7}, intersect(id, datarun{7}.cell_ids));
 % 
 % 
-% datarun{8} = load_data('/Analysis/xyao/2014-03-20-0/data006-map/data006-map', opt);
+datarun{8} = load_data('/Analysis/xyao/2014-03-20-0/data006-map/data006-map', opt);
 
 
 
@@ -365,16 +365,16 @@ id2 = id(idx2);
 
 xlabel('1st Principal Component')
 ylabel('2nd Principal Component')
-% subplot(2, 1, 2); 
-% plot(scores(:, 1), scores(:, 3), 'o')
-% xlabel('1st Principal Component')
-% ylabel('3rd Principal Component')
-
-% IN = inpolygon(scores(:, 1), scores(:, 3), x, y);
-% [~, idx1] = find(IN' == 1);
-% id1 = id(idx1);
-% [~, idx2] = find(IN' == 0);
-% id2 = id(idx2);
+subplot(2, 1, 2); 
+plot(scores(:, 1), scores(:, 3), 'o')
+xlabel('1st Principal Component')
+ylabel('3rd Principal Component')
+ylim([-0.4 0.3])
+IN = inpolygon(scores(:, 1), scores(:, 3), x, y);
+[~, idx1] = find(IN' == 1);
+id1 = id(idx1);
+[~, idx2] = find(IN' == 0);
+id2 = id(idx2);
 
 % plot speed tunning curves of cells in same type
 
@@ -567,7 +567,28 @@ for i = 36:length(id)
     set(h,'yticklabel',[]);
     end
 end
-    
+
+%%
+n_ffp = 1;
+
+[raster_ff, raster_ff_all] = deal(cell(n_ffp, 1));
+[raster_ff{1}, raster_ff_all{1}] = get_ffp_raster(datarun{8}, id, 3);
+
+
+for i = 36:36 %length(id) 
+%     if ~isempty(raster_ff{1}{i}) || ~isempty(raster_ff{2}{i})
+        FigHandle = figure;
+        set(FigHandle, 'Position', [1 1 400 400])
+        for d = 1:n_ffp
+        subplot(1, n_ffp, d)
+        plot_ffp(raster_ff{d}, raster_ff_all{d}, i, 3)
+        title([num2str(id(i))]) % ' ' ll{d}])
+        end
+        
+%         print_close(1, [24, 12], num2str(ds_id(i)))
+%     end
+end
+
 %% maxmium firing rate
 % psth
 
@@ -765,7 +786,7 @@ for i = 1:6
     for rgc = 1:length(id)
         if ~isempty(raster{i}{rgc})
         for time = 1:length(tp)
-            spikes = floor(raster_sum{i}{rgc}{time}*bin_rate);
+            spikes = floor(raster_p_sum{i}{rgc}{time}*bin_rate);
             tmp_binned_spikes = zeros(1, signal_length);
             tmp_binned_spikes(spikes) = 1;
             hist_spikes{i}{rgc}(time, :) = tmp_binned_spikes;
@@ -799,7 +820,7 @@ for i = 1:6
         end
         
     end
-    ratio{i} = F1{i}./F2{i};
+    ratio{i} = F2{i}./F1{i};
 end
 
 % plot 
@@ -992,7 +1013,7 @@ ste_temp = nanstd(ratio_temp)/sqrt(length(idx1));
 errorbar(speed, avg_temp, ste_temp, 'r')
 set(gca, 'XScale', 'log')
 xlabel('speed')
-ylabel('F1/F2')
+ylabel('F2/F1')
 title('SP120  on-off DSGC')
 xlim([min(speed) max(speed)])
 legend('NDF 3', 'NDF 0')
@@ -1009,7 +1030,7 @@ ste_temp = nanstd(ratio_temp)/sqrt(length(idx1));
 errorbar(speed, avg_temp, ste_temp, 'r')
 set(gca, 'XScale', 'log')
 xlabel('speed')
-ylabel('F1/F2')
+ylabel('F2/F1')
 title('SP240  on-off DSGC')
 xlim([min(speed) max(speed)])
 
@@ -1027,7 +1048,7 @@ ste_temp = nanstd(ratio_temp)/sqrt(length(idx2));
 errorbar(speed, avg_temp, ste_temp, 'r')
 set(gca, 'XScale', 'log')
 xlabel('speed')
-ylabel('F1/F2')
+ylabel('F2/F1')
 title('SP120  on DSGC')
 xlim([min(speed) max(speed)])
 
@@ -1043,7 +1064,7 @@ ste_temp = nanstd(ratio_temp)/sqrt(length(idx2));
 errorbar(speed, avg_temp, ste_temp, 'r')
 set(gca, 'XScale', 'log')
 xlabel('speed')
-ylabel('F1/F2')
+ylabel('F2/F1')
 title('SP240  on DSGC')
 xlim([min(speed) max(speed)])
 

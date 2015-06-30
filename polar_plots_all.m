@@ -10,7 +10,7 @@ axes_handle = [];
 ylim = zeros(1, length(U));
 X = floor(sqrt(length(U)));
 for i = 1:length(U)
-    ax(i) = subplot(X,length(U)/X,i);
+    ax(i) = subplot(X,ceil(length(U)/X),i);
     set(ax(i), 'FontName', 'AvantGarde', 'FontSize', 18)
     h1 = compass(U{i,1},V{i,1});
     h = findall(gca, 'type', 'line'); % find all lines in the current figure

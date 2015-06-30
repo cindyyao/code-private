@@ -73,14 +73,14 @@ end
 
 %% 
 
-screen_size = [12 12];
+screen_size = [22 12];
 % name = {'type_1', 'type_2'};
-for i =2:2
+for i =1:4
 set(figure(i), 'paperpositionmode', 'auto');
 % set(figure(1), 'PaperPosition', [-0.5 -0.25 22 10]);
 set(gcf, 'PaperUnits', 'inch');
 set(figure(i), 'PaperSize', screen_size);
-print(figure(i), '-dpdf', 'speed_tuning')
+print(figure(i), '-dpdf', num2str(i))
 end
 
 %%

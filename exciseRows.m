@@ -1,5 +1,5 @@
 
-function [rho theta] = exciseRows(rho, theta)
+function [rho] = exciseRows(rho)
 %Function removes any rows that contain Inf or Nans from rho matrix
 %Input: Rho Matrix that contains Inf and Nans
 %Output: Rho Matrix without Inf or Nans as well as adjusted Theta Matrix

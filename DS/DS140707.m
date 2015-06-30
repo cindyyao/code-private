@@ -61,11 +61,11 @@ I = sum(I');
 id4 = id(I == 4); % DS cells that can be found in all light levels
 idx4 = arrayfun(@(x) find(id == x), id4);
 
-[raster, raster_p_sum, p_idx] = deal(cell(4, 1));
+[raster, raster_p_sum, raster_n_sum, p_idx, n_idx] = deal(cell(4, 1));
 for i = 1:4    
     [NumSpikesCell, StimComb] = get_spikescellstim(datarun{i},id,0);
     DS{i} = sort_direction(dscellanalysis(NumSpikesCell, StimComb));
-    raster{i} = get_ds_raster(datarun{i}, id, 'MG', 'stop', 8);
+    raster{i} = get_ds_raster(datarun{i}, id);
 end
 
 param_p = 5; % choose which params to use to calculate prefer direction indices 
@@ -75,6 +75,7 @@ norm_max_r = cell(4, 1);
 
 for i = 1:4
     [raster_p_sum{i}, p_idx{i}] = get_pdirection_raster(raster{i}, DS{i}.angle{param_p});
+    [raster_n_sum{i}, n_idx{i}] = get_ndirection_raster(raster{i}, DS{i}.angle{param_p});
     MAG_all_norm{i} = normalize_MAG(DS{i});
     rep = datarun{i}.stimulus.repetitions;
     max_r{i} = max_firing_rate(raster_p_sum{i}, 0.2, 8)/rep;
@@ -86,7 +87,7 @@ ll = {'NDF3 SP60', 'NDF3 SP240', 'NDF0 SP60', 'NDF0 SP240'};
 
 %% plot cell summary
 
-for cc = 31:31 %length(id)
+for cc = 15:15 %length(id)
     plot_ds_raster(DS, raster, cc, id(cc), ll, 2, 2, 0)
 end
 
@@ -119,7 +120,8 @@ end
 
 %% classification based on speed tunning
 %% pca
-mag_pca = MAG_all_norm{2};
+mag_pca = MAG_all_norm{2}(5:8, :);
+% mag_pca = MAG_all_norm{2};
 % mag_pca = MAG_all_norm{1}(:, idx4);
 mag_pca = mag_pca';
 [id_sub, idx_sub] = deal(cell(3, 1));

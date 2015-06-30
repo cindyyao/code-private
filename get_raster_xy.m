@@ -1,4 +1,4 @@
-function spikes_by_trials = get_raster_xy(spike_times, trial_begin_times, varargin)
+function spikes_by_trials = get_raster_xy(spike_times, trial_begin_times, duration, varargin)
 %
 % raster_gdf(spike_times,cell_specification,trigger,varargin)
 %  
@@ -34,8 +34,6 @@ p.addParamValue('first_trial', 1, @isnumeric)
 p.addParamValue('foa', 0)
 p.addParamValue('plot', true);
 p.addParamValue('labels', true);
-p.addParamValue('duration', []);
-
 
 % parse inputs
 p.parse(varargin{:});
@@ -44,6 +42,14 @@ params = p.Results;
 
 %%% function begins here %%%
 
+% figure out the duration of each trial
+if isempty(params.stop)
+    params.stop = diff(trial_begin_times);
+    stop_last = duration - trial_begin_times(end);
+    params.stop = [params.stop stop_last];
+else
+    params.stop = repmat(params.stop, length(trial_begin_times), 1);
+end
 
 % setup the figure
 if params.plot
@@ -60,23 +66,10 @@ spikes_by_trials = cell(num_trials, 1);
 trial_plot_line = 1; % counter
 
 for i = params.first_trial:num_trials
-    if isempty(params.stop)
-        if i < num_trials
-            params.stop = trial_begin_times(i+1) - trial_begin_times(i);
-        else
-            params.stop = params.duration - trial_begin_times(i);
-        end
-        % shift spikes
-        ith_shifted_times = spike_times - trial_begin_times(i);  
-        % get spikes in trial frame
-        ith_trial_times = ith_shifted_times(ith_shifted_times >= params.start & ith_shifted_times <= params.stop);
-        params.stop = [];
-    else
-        % shift spikes
-        ith_shifted_times = spike_times - trial_begin_times(i);  
-        % get spikes in trial frame
-        ith_trial_times = ith_shifted_times(ith_shifted_times >= params.start & ith_shifted_times <= params.stop);
-    end
+    % shift spikes
+    ith_shifted_times = spike_times - trial_begin_times(i);  
+    % get spikes in trial frame
+    ith_trial_times = ith_shifted_times(ith_shifted_times >= params.start & ith_shifted_times <= params.stop(i));
     % plot the spike times
     if params.plot
         if ~isempty(ith_trial_times)
@@ -88,6 +81,5 @@ for i = params.first_trial:num_trials
     trial_plot_line = trial_plot_line + 1; 
     % store spike times
     spikes_by_trials{i} = ith_trial_times;
-    
 end
 
