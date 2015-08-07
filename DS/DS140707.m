@@ -30,7 +30,7 @@ datarun{9} = load_data('/Analysis/xyao/2014-07-07-0/data008-map/data008-map', op
 datarun{9}.names.stimulus_path = '/Analysis/xyao/2014-07-07-0/stimuli/s08';
 datarun{9} = load_stim(datarun{9}, 'user_defined_trigger_interval', 10);
 
-% datarun{10} = load_data('/Analysis/xyao/2014-07-07-0/data007-map/data007-map', opt);
+datarun{10} = load_data('/Analysis/xyao/2014-07-07-0/data007-map/data007-map', opt);
 % datarun{10} = load_sta(datarun{10});
 % datarun{10} = get_autocorrelations(datarun{10}, intersect(id, datarun{10}.cell_ids));
 %% 

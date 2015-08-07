@@ -73,15 +73,24 @@ end
 
 %% 
 
-screen_size = [22 12];
-% name = {'type_1', 'type_2'};
-for i =1:4
-set(figure(i), 'paperpositionmode', 'auto');
-% set(figure(1), 'PaperPosition', [-0.5 -0.25 22 10]);
-set(gcf, 'PaperUnits', 'inch');
-set(figure(i), 'PaperSize', screen_size);
-print(figure(i), '-dpdf', num2str(i))
+screen_size = [22 14];
+% name = cell_type;
+for i =1:3
+    name = num2str(i+4);
+    set(figure(i), 'paperpositionmode', 'auto');
+    % set(figure(1), 'PaperPosition', [-0.5 -0.25 22 10]);
+    set(gcf, 'PaperUnits', 'inch');
+    set(figure(i), 'PaperSize', screen_size);
+    print(figure(i), '-dpdf', name)
+    saveas(figure(i), name, 'fig')
 end
+
+%%
+for i = 1:1
+    h = figure(i);
+    saveas(gcf, 'output','png')
+end
+    
 
 %%
 

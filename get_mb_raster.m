@@ -1,7 +1,7 @@
 function raster_all = get_mb_raster(datarun, cell_id, duration)
 % raster_all = get_ds_raster(datarun, cell_id)
 % datarun: drifting grating dataset
-% raster_all: S cells, M spatial period x N temporal period x R direction x P repeats
+% raster_all: S cells, M spatial period x N temporal period x R direction x (S color) x P repeats
 % for each cell
 %
 % xyao

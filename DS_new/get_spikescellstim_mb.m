@@ -4,7 +4,7 @@ function[NumSpikesCell, MaxRate, StimComb] = get_spikescellstim_mb(datarun,celli
 
 %Calculate average total number of spikes for each stimulus type      
 
-%Input: Moving bar datarun structureedit 
+%Input: Moving bar datarun structure
 
         %timedur: When last trial should stop
         
@@ -12,19 +12,22 @@ function[NumSpikesCell, MaxRate, StimComb] = get_spikescellstim_mb(datarun,celli
 
 %Outputs: NumSpikesCell: Has average total number of spikes for each stimulus type for each cell
 
-          %StimComb: All the DG stimulus combinations (col 1: spatial,col 2: temporal, col 3: direction)
+          %StimComb: All the DG stimulus combinations (col 1: spatial,col 2: temporal, col 3: direction, col 4: bar color, col 5: background color)
 
 %Sneha Ravi 
 %Last revision: 12-17-2012
+%Revised by Xiaoyang Yao: 7-1-2015
           
           
 %Initialize output matrices          
 NumSpikesCell = zeros(length(cellids), length(datarun.stimulus.combinations));
 MaxRate = zeros(length(cellids), length(datarun.stimulus.combinations));
-StimComb = zeros(length(datarun.stimulus.combinations), length(fieldnames(datarun.stimulus.params)));
-StimComb(:,1) = [datarun.stimulus.combinations.BAR_WIDTH];
-StimComb(:,2) = [datarun.stimulus.combinations.DELTA];
-StimComb(:,3) = [datarun.stimulus.combinations.DIRECTION];
+StimComb = cell(length(datarun.stimulus.combinations), length(fieldnames(datarun.stimulus.params)));
+StimComb(:,1) = {datarun.stimulus.combinations.BAR_WIDTH}';
+StimComb(:,2) = {datarun.stimulus.combinations.DELTA}';
+StimComb(:,3) = {datarun.stimulus.combinations.DIRECTION}';
+StimComb(:,4) = {datarun.stimulus.combinations.RGB}';
+StimComb(:,5) = {datarun.stimulus.combinations.BACK_RGB}';
 edges = 0:bin_size:500;
 %Calculation of total spike number for each trial for each cell, then average calculated and placed in NumSpikesCell
 for k = 1:length(cellids)
@@ -45,7 +48,7 @@ for k = 1:length(cellids)
             Spikes_temp = Spikes_temp - datarun.stimulus.triggers(1,j);
             NumSpikesAll(1, j) = sum(Spikes_idx);
             MaxRateAll(1, j) = max(histc(Spikes_temp, edges)); 
-        end   
+        end 
     end
     NumSpikesCell(k,:) = grpstats(NumSpikesAll,datarun.stimulus.trial_list,'mean')';
     MaxRate(k,:) = grpstats(MaxRateAll,datarun.stimulus.trial_list,'mean')';

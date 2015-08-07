@@ -3,6 +3,7 @@ addpath /Volumes/lab/Experiments/Array/Shared/sravi/Tchaikowsky/sravi/matlab/Cla
 addpath /Volumes/lab/Experiments/Array/Shared/sravi/Tchaikowsky/sravi/matlab/DS' cell analysis'/
 
 opt = struct('load_params', 1,'load_neurons', 1, 'load_ei', 1);
+cd /Users/xyao/matlab/code-private/DS_new/
 
 % load data
 datadg{1} = load_data('/Volumes/lab/analysis/2015-06-09-0/data005-map/data005-map', opt);

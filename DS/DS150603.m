@@ -1,4 +1,5 @@
 addpath /Volumes/lab/Experiments/Array/Shared/sravi/Tchaikowsky/sravi/matlab/DS' cell analysis'/
+cd /Users/xyao/matlab/code-private/
 
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 

@@ -14,6 +14,6 @@ for j = 1:size(ds_in.rho, 1)
         ds_in.rho{j, i} = rho_seq;
         ds_in.RHO{j, i} = RHO_seq;
         ds_in.theta{j, i} = repmat(theta_seq, size(ds_in.theta{j, i}, 1), 1);
-end
+    end
 ds_out = ds_in;
 end
