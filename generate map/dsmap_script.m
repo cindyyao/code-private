@@ -1,38 +1,29 @@
-dg_path = '/Analysis/xyao/2015-07-03-0/data012-map/data012-map';
-dg_stimulus_path = '/Analysis/xyao/2015-07-03-0/stimuli/s12.mat';
-wn_path = '/Analysis/xyao/2015-07-03-0/data016-map/data016-map';
-wn_nonmap_path = '/Analysis/xyao/2015-07-03-0/data016/data016';
+% wn_map_path = '/Analysis/xyao/2015-07-03-0/data016-map/data016-map';
+wn_path = '/Analysis/xyao/2015-07-03-0/data016/data016';
 cd /Users/xyao/matlab/code-private/DS_new/
-
 %% load data
 opt = struct('load_params', 1,'load_neurons', 1, 'load_ei', 1);
-datadg = load_data(dg_path, opt);
-datadg.names.stimulus_path = dg_stimulus_path;
-datadg = load_stim_matlab(datadg, 'user_defined_trigger_interval', 10);
+% datawn_map = load_data(wn_map_path, opt);
+% datawn_map = load_sta(datawn_map);
+% datawn_map = get_rf_coms(datawn_map, 'all');
 
 datawn = load_data(wn_path, opt);
 datawn = load_sta(datawn);
-datawn_nonmap = load_data(wn_nonmap_path, opt);
-datawn_nonmap = load_sta(datawn_nonmap);
-datawn_nonmap = get_rf_coms(datawn_nonmap, 'all');
+datawn = get_rf_coms(datawn, 'all');
 
 
-%% get array location in display coordinates
+%% map camera and display coordinates
 
-% load stimulus picture taken by camera
-im_s = imread('WN.jpg');
-
-% get stimulus frame in display coordinates
-stixel_size = 30;
-display_width = 800; display_height = 600;
-x_start = 100; x_end = 700; y_start = 0; y_end = 600;
+im_s = imread('WN.jpg'); % load stimulus picture taken by camera
+im_array = imread('array_.jpg'); % load array image taken by camera
+stixel_size = 30; % frame shown in WN.jpg
 movie_path = '/Volumes/lab/acquisition/movie-xml/BW-30-6-0.48-11111-20x20-60.35.xml';
-mov = get_movie(movie_path, datawn_nonmap.triggers, 1);
-mov_frame = matrix_scaled_up(squeeze(mov(:,:,1)), stixel_size);
 
-% select control points
+mov = get_movie(movie_path, 0, 1);
+mov_frame = matrix_scaled_up(squeeze(mov(:,:,1)), stixel_size);
 clear movingPoints fixedPoints
-cpselect(im_s, mov_frame)
+cpselect(im_s, mov_frame) % select 4 control points
+
 
 %% register two images
 tform = fitgeotrans(movingPoints, fixedPoints, 'projective');
@@ -41,9 +32,6 @@ figure
 imshow(registered);
 figure
 imshowpair(mov_frame,registered,'blend');
-
-% load array image taken by camera
-im_array = imread('array_.jpg');
 
 % transform array image into display coordinates
 registered_array = imwarp(im_array, tform, 'OutputView', imref2d(size(mov_frame)));
@@ -66,46 +54,24 @@ array_location_display = ginput;
 
 % get array location in ei coordinates
 elec_corner = [195 126 4 455];
-array_location_ei = datawn_nonmap.ei.position(elec_corner,:);
+array_location_ei = datawn.ei.position(elec_corner,:);
 Tform = maketform('projective', array_location_ei, array_location_display);
-
 test = tformfwd(Tform, array_location_ei)-array_location_display % should be equal or close to zeros
 
-% get cell location from ei
-on1 = get_cell_ids(datawn_nonmap, 'ON type 1');
-off1 = get_cell_ids(datawn_nonmap, 'OFF type 1');
-off2 = get_cell_ids(datawn_nonmap, 'OFF type 2');
-off3 = get_cell_ids(datawn_nonmap, 'OFF type 3');
-off4 = get_cell_ids(datawn_nonmap, 'OFF type 4');
-
+%% get cell location from ei
+on1 = get_cell_ids(datawn, 'ON type 1');
+off1 = get_cell_ids(datawn, 'OFF type 1');
+off2 = get_cell_ids(datawn, 'OFF type 2');
+off3 = get_cell_ids(datawn, 'OFF type 3');
+off4 = get_cell_ids(datawn, 'OFF type 4');
 robust_id = [on1 off1 off2 off3 off4];
-robust_idx = get_cell_indices(datawn_nonmap, robust_id);
+robust_idx = get_cell_indices(datawn, robust_id);
 
-frame = datawn_nonmap.ei.nrPoints + datawn_nonmap.ei.nlPoints + 1;
-elec = size(datawn_nonmap.ei.position, 1);
-distance = 1;
-center_ei = zeros(length(robust_id),2);
-stixel_size_ = datawn_nonmap.stimulus.stixel_width;
-for i = 1:length(robust_id)
-    distance_temp = distance;
-    full_elec_n = sum(1:distance_temp)*6+1; % Assume all arrays have hexagonal-arranged electrodes
-    ei = datawn_nonmap.ei.eis{robust_idx(i)};
-    ei = ei';
-    [~,I] = max(abs(ei(:)));
-    elec_n = ceil(I/frame);
-    elecs_n = get_ei_neighbors(elec_n, elec, distance_temp);
-    while(length(elecs_n) < full_elec_n)
-        distance_temp = distance_temp - 1;
-        elecs_n = get_ei_neighbors(elec_n, elec, distance_temp);
-        full_elec_n = sum(1:distance_temp)*6+1;
-    end
-    points = datawn_nonmap.ei.position(elecs_n,:);
-    mass = max(abs(ei(:,elecs_n)));
-    center_ei(i,:) = centroid(points, mass);
-end
-
+distance = 1; % range used to calculate EI com
+stixel_size_ = datawn.stimulus.stixel_width;
+center_ei = get_ei_com(datawn, robust_id, distance);
 center_ei_display = tformfwd(Tform, center_ei);
-center_sta = cell2mat(datawn_nonmap.stas.rf_coms(robust_idx)) * stixel_size_;
+center_sta = cell2mat(datawn.stas.rf_coms(robust_idx)) * stixel_size_;
 center_offset = center_sta - center_ei_display;
 [center_offset_pol(:,1), center_offset_pol(:,2)] = cart2pol(center_offset(:,1),center_offset(:,2));
 
@@ -134,108 +100,204 @@ quiver(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,1),center_o
 id_text = cellfun(@num2str, num2cell(robust_id), 'Uni', false);
 text(center_ei_display(:,1), center_ei_display(:,2), id_text);
 
-% 
-figure
-scatter3(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,2))
-
 % fit plane
-fit_plane
+dataX(:,1:2) = center_ei_display;
+dataX(:,3) = center_offset(:,1);
+dataY(:,1:2) = center_ei_display;
+dataY(:,3) = center_offset(:,2);
+
+[normal_x, meanX, pcaExplainedX, sseX] = fit_plane(dataX);
+[normal_y, meanY, pcaExplainedY, sseY] = fit_plane(dataY);
 
 %% get DS cell id
-% [NumSpikesCell, StimComb] = get_spikescellstim(datadg,datadg.cell_ids,0);
-% ds_struct = dscellanalysis(NumSpikesCell, StimComb, datadg);
-% 
-% params_idx = input('indices of parameters for classification: (eg. [1 2])\n'); 
-% [ds_id, nonds_id] = classify_ds(datadg, ds_struct, params_idx);
+% dg_path = '/Analysis/xyao/2015-07-03-0/data012-map/data012-map';
+% dg_stimulus_path = '/Analysis/xyao/2015-07-03-0/stimuli/s12.mat';
+dg_path = '/Analysis/xyao/2015-07-03-0/data012/data012';
+dg_stimulus_path = '/Analysis/xyao/2015-07-03-0/stimuli/s12.mat';
+datadg = load_data(dg_path, opt);
+datadg.names.stimulus_path = dg_stimulus_path;
+datadg = load_stim_matlab(datadg, 'user_defined_trigger_interval', 10);
+
+[NumSpikesCell, StimComb] = get_spikescellstim(datadg,datadg.cell_ids,0);
+ds_struct = dscellanalysis(NumSpikesCell, StimComb, datadg);
+params_idx = input('indices of parameters for classification: (eg. [1 2])\n'); 
+[ds_id, nonds_id] = classify_ds(datadg, ds_struct, params_idx);
 ds_idx = get_cell_indices(datadg, ds_id);
 
-%% get DS cell location
+%% classify on vs on-off DSGC
+[NumSpikesCell, StimComb] = get_spikescellstim(datadg,ds_id,0);
+DG = sort_direction(dscellanalysis(NumSpikesCell, StimComb,datadg));
+MAG_all_norm_dg = normalize_MAG(DG);
+mag_pca = MAG_all_norm_dg;
+mag_pca = mag_pca';
+[id_sub, idx_sub] = deal(cell(2, 1));
 
-% cell_location = get_cell_location(datawn, ds_id, 'ei_mode', true);
-% [ds_id_wn, cell_location] = Test_Cell_Location(ds_id_test, cell_location);
+FigHandle = figure;
+set(FigHandle, 'Position', [1 1 380 400])
 
-% get DS cell ei location (display coordinate)
-center_ei_ds = zeros(length(ds_id),2);
-for i = 1:length(ds_id)
-    distance_temp = distance;
-    full_elec_n = sum(1:distance_temp)*6+1; % Assume all arrays have hexagonal-arranged electrodes
-    ei = datadg.ei.eis{ds_idx(i)};
-    ei = ei';
-    [~,I] = max(abs(ei(:)));
-    elec_n = ceil(I/frame);
-    elecs_n = get_ei_neighbors(elec_n, elec, distance_temp);
-    while(length(elecs_n) < full_elec_n)
-        distance_temp = distance_temp - 1;
-        elecs_n = get_ei_neighbors(elec_n, elec, distance_temp);
-        full_elec_n = sum(1:distance_temp)*6+1;
-    end
-    points = datadg.ei.position(elecs_n,:);
-    mass = max(abs(ei(:,elecs_n)));
-    center_ei_ds(i,:) = centroid(points, mass);
+[~,scores,~,~] = princomp(mag_pca);
+pc1 = 1; pc2 = 3;
+plot(scores(:, pc1), scores(:, pc2), 'o')
+hold on
+for i = 1:2
+    [x, y] = ginput;
+    plot(x, y)
+    IN = inpolygon(scores(:, pc1), scores(:, pc2), x, y);
+    [~, idx_sub{i}] = find(IN' == 1);
+    id_sub{i} = ds_id(idx_sub{i});
 end
+
+figure
+plot(scores(idx_sub{1}, pc1), scores(idx_sub{1}, pc2), 'ro', scores(idx_sub{2}, pc1), scores(idx_sub{2}, pc2), 'bo')
+
+figure
+v = 4*datadg.stimulus.params.SPATIAL_PERIOD./datadg.stimulus.params.TEMPORAL_PERIOD;
+subplot(1, 2, 1)
+semilogx(v, exciseColumn(MAG_all_norm_dg(:, idx_sub{1})), 'r')
+hold on
+semilogx(v, exciseColumn(MAG_all_norm_dg(:, idx_sub{2})), 'b')
+xlabel('micron/second')
+ylabel('Response')
+xlim([v(end) v(1)])
+
+subplot(1, 2, 2)
+semilogx(v, exciseColumn(MAG_all_norm_dg(:, idx_sub{1})), 'r')
+hold on
+semilogx(v, exciseColumn(MAG_all_norm_dg(:, idx_sub{2})), 'b')
+xlabel('micron/second')
+ylabel('Response')
+xlim([v(end) v(1)])
+
+t = 4;
+figure
+compass(DG.U{t}(idx_sub{1}), DG.V{t}(idx_sub{1}), 'r')
+hold on
+compass(DG.U{t}(idx_sub{2}), DG.V{t}(idx_sub{2}), 'b')
+
+%% classify DSGC into subtypes (directions)
+t = 3;
+h = figure;
+dirn = 4;
+set(h, 'Position', [1 1 500 500])
+compass(DG.U{t}(idx_sub{1}), DG.V{t}(idx_sub{1}));
+color = 'brgkc';
+
+for i = 1:dirn
+    hold on
+    [x, y] = ginput;
+    plot(x, y, color(i));
+
+    IN = inpolygon(DG.U{t}(idx_sub{1}), DG.V{t}(idx_sub{1}), x, y);
+    [~, I] = find(IN == 1);
+    idx_dir{i} = idx_sub{1}(I);
+    id_dir{i} = ds_id(idx_dir{i});
+end
+
+%
+t = 3;
+h = figure;
+dirn = 3;
+set(h, 'Position', [1 1 500 500])
+compass(DG.U{t}(idx_sub{2}), DG.V{t}(idx_sub{2}));
+color = 'brgkc';
+
+for i = 1:dirn
+    hold on
+    [x, y] = ginput;
+    plot(x, y, color(i));
+
+    IN = inpolygon(DG.U{t}(idx_sub{2}), DG.V{t}(idx_sub{2}), x, y);
+    [~, I] = find(IN == 1);
+    idx_dir_on{i} = idx_sub{2}(I);
+    id_dir_on{i} = ds_id(idx_dir_on{i});
+end
+
+
+
+%% map two dg to wn
+[cell_list_map, ~] = map_ei(datadg, datawn);
+ds_list_map = cell_list_map(ds_idx);
+success_idx = ~cellfun(@isempty, ds_list_map);
+ds_id_dgmap = ds_id(success_idx);
+ds_idx_dgmap = ds_idx(success_idx);
+ds_id_wnmap = cell2mat(ds_list_map);
+
+t = 4;
+figure
+compass(DG.U{t}(success_idx), DG.V{t}(success_idx), 'b')
+
+for i = 1:4
+    id_dir_map{i} = intersect(id_dir{i}, ds_id_dgmap);
+    id_dir_nomap{i} = setdiff(id_dir{i}, id_dir_map{i});
+end
+for i = 1:3
+    id_dir_on_map{i} = intersect(id_dir_on{i}, ds_id_dgmap);
+    id_dir_on_nomap{i} = setdiff(id_dir_on{i}, id_dir_on_map{i});
+end
+
+n = 8;
+for i = 1:4
+    id_final_oo{i} = id_dir_map{i}(randsample(length(id_dir_map{i}), n));
+end
+id_final_oo = cell2mat(id_final_oo);
+
+n = 1;
+for i = 1:3
+    id_final_on{i} = id_dir_on_nomap{i}(randsample(length(id_dir_on_nomap{i}), n));
+end
+id_final_on = cell2mat(id_final_on);
+id_final_on_ = cell2mat(id_dir_on_map);
+
+
+id_final = sort([id_final_oo id_final_on id_final_on_]);
+
+idx_final = get_cell_indices(datadg, id_final);
+id_final_wn = cell_list_map(idx_final);
+
+%% get DS cell ei location (display coordinate)
+center_ei_ds = get_ei_com(datadg, id_final, 1);
 center_ei_ds = tformfwd(Tform, center_ei_ds);
 
-offset_x_ds = meanX*normal_x*ones(length(ds_id),1) - center_ei_ds*normal_x(1:2);
-offset_y_ds = meanX*normal_y*ones(length(ds_id),1) - center_ei_ds*normal_y(1:2);
+offset_x_ds = meanX*normal_x*ones(length(id_final),1) - center_ei_ds*normal_x(1:2);
+offset_y_ds = meanY*normal_y*ones(length(id_final),1) - center_ei_ds*normal_y(1:2);
 offset_ds = [offset_x_ds offset_y_ds];
-center_sta_ds_est = (center_ei_ds + offset_ds)/stixel_size_;
+% center_sta_ds_est = (center_ei_ds + offset_ds)/stixel_size_;
+center_sta_ds_est = center_ei_ds + offset_ds;
 
-%%
-% on-off dsgc
-
-oo_ds = {'posterior', 'inferior', 'anterior', 'superior'};
-x = [3 3 4 4]; y = [5 5 5 5];
-for i = 4:4
-    figure
-    for cc = 1:length(id_dir{i})
-        subplot(x(i), y(i), cc)
-        plot_rf(datawn, id_dir{i}(cc), 'fit', false, 'title', false);
-        hold on
-        plot(center_sta_ds_est(idx_dir{i}(cc), 1), center_sta_ds_est(idx_dir{i}(cc), 2), 'ro')
-        plot(center_ei_ds(idx_dir{i}(cc), 1)/stixel_size_, center_ei_ds(idx_dir{i}(cc), 2)/stixel_size_, 'go')
-    end
-    subplot(x(i), y(i), 1)
-    title(oo_ds{i})
-    legend('w correction', 'w/o correction')
-end
-
-% on dsgc
-on_ds = {'inferior', 'anterior', 'superior'};
-x = [2 3 2]; y = [2 3 3];
-for i = 1:1
-    figure
-    for cc = 1:length(id_dir_on{i})
-        if ismember(id_dir_on{i}(cc), datawn.cell_ids)
-            subplot(x(i), y(i), cc)
-            plot_rf(datawn, id_dir_on{i}(cc), 'fit', false, 'title', false);
-            hold on
-            plot(center_sta_ds_est(idx_dir_on{i}(cc), 1), center_sta_ds_est(idx_dir_on{i}(cc), 2), 'ro')
-            plot(center_ei_ds(idx_dir_on{i}(cc), 1)/stixel_size_, center_ei_ds(idx_dir_on{i}(cc), 2)/stixel_size_, 'go')
-        end
-    end
-    subplot(x(i), y(i), 2)
-    title(on_ds{i})
-    legend('w correction', 'w/o correction')
-end
-
+%% manually correct center location if needed
+center_corrected = correct_ei_center(datawn, id_final_wn, center_sta_ds_est, stixel_size_);
 
 %% generate circular masks
-n = size(cell_location,1);
-radius = 3;
-masks = make_circular_masks(cell_location, ones(n,1)*radius, 60, 60, 10);
+radius = 6;
+display_width = 800;
+display_height = 600;
 
-
-
-dlmwrite('maptest.txt', masks{1},  'delimiter', '\t', 'newline', 'pc')
-
-
-
-
-
+n = size(center_corrected,1);
+radius_all = ones(n,1)*radius;
+center_corrected(:,1) = center_corrected(:,1)+abs(display_width-display_height)/2;
+masks = make_circular_masks(center_corrected, radius_all, display_width, display_height);
+% maploc = '/Volumes/lab/analysis/2015-07-03-0/stimuli/targeted_flash/';
+maploc = '/Analysis/xyao/test/stimuli/targeted_flash/';
+for i = 1:length(id_final)
+    name = ['map-' num2str(i-1, '%04.0f') '.txt'];
+    dlmwrite([maploc name], masks{i},  'delimiter', '\t', 'newline', 'pc')
+end
 
 %%
-figure(10)
-subplot(1,2,1)
-
-subplot(1,2,2)
-ginput()
+% center_sta_ds = cell2mat(datawn_map.stas.rf_coms(ds_idx)) * stixel_size_;
+% 
+% i = 4;
+% figure
+% imagesc(masks{i})
+% hold on
+% plot(center_sta_ds(i, 1)+100, center_sta_ds(i,2), 'ro')
+% 
+% 
+% figure
+% for i = 1:length(ds_id)
+%     imagesc(masks{i})
+%     hold on
+% %     plot(center_sta_ds_est(i, 1), center_sta_ds_est(i,2), 'ro')
+%     plot(367.05, 271.5, 'ro')
+%     pause
+% end

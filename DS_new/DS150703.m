@@ -6,7 +6,8 @@ opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 datadg{1} = load_data('/Analysis/xyao/2015-07-03-0/data000-map/data000-map', opt);
 datadg{1}.names.stimulus_path = '/Analysis/xyao/2015-07-03-0/stimuli/s00.mat';
 datadg{1} = load_stim_matlab(datadg{1}, 'user_defined_trigger_interval', 10);
-datadg{2} = load_data('/Analysis/xyao/2015-07-03-0/data003-map/data003-map', opt);
+% datadg{2} = load_data('/Analysis/xyao/2015-07-03-0/data003-map/data003-map', opt);
+datadg{2} = load_data('/Analysis/xyao/2015-07-03-0/data003/data003', opt);
 datadg{2}.names.stimulus_path = '/Analysis/xyao/2015-07-03-0/stimuli/s03.mat';
 datadg{2} = load_stim_matlab(datadg{2}, 'user_defined_trigger_interval', 10);
 datadg{3} = load_data('/Analysis/xyao/2015-07-03-0/data006-map/data006-map', opt);
@@ -50,9 +51,9 @@ datarun = load_data('/Analysis/xyao/2015-07-03-0/data016/data016', opt);
 
 %%
 n = 5;
-i = 5;
+i = 2;
 [NumSpikesCell, StimComb] = get_spikescellstim(datadg{i},datadg{i}.cell_ids,0);
-ds_struct = dscellanalysis(NumSpikesCell, StimComb);
+ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg{i});
 
 params_idx = [3 4]; % which parameters to use for classification
 [ds_id, nonds_id] = classify_ds(datadg{i}, ds_struct, params_idx);

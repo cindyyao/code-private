@@ -73,10 +73,10 @@ end
 
 %% 
 
-screen_size = [22 14];
-% name = cell_type;
-for i =1:3
-    name = num2str(i+4);
+screen_size = [14 14];
+name = 'on_mosaic_from_corrected_ei';
+for i =2:2
+%     name = num2str(i+4);
     set(figure(i), 'paperpositionmode', 'auto');
     % set(figure(1), 'PaperPosition', [-0.5 -0.25 22 10]);
     set(gcf, 'PaperUnits', 'inch');

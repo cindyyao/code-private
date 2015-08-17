@@ -19,3 +19,5 @@ X(:,2) = log(ds_struct.mag{params_idx(2),1})';
 
 ds_id = datarun.cell_ids(idx==2);
 nonds_id = datarun.cell_ids(idx==1);
+% ds_id = id_init;
+% nonds_id = setdiff(datarun.cell_ids, ds_id)
