@@ -6,7 +6,7 @@ for i = 1:4
 end
 
 for cc = 1:1 %length(id)
-    plot_ds_raster(nDS, raster_temp, cc, 47, ll, 2, 2, 0)
+    plot_ds_raster(nDS, raster_temp, cc, 47, 'title', 2, 2, 0)
 end
 
 figure

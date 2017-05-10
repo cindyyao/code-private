@@ -77,6 +77,7 @@ for i = 1:6
     raster{i} = get_ds_raster(datarun{i}, id);
 end
 
+%% 
 param_p = 5; % choose which params to use to calculate prefer direction indices 
 MAG_all_norm = cell(6, 1);
 max_r = cell(6, 1);
@@ -774,7 +775,7 @@ end
 duration = 8;
 bin_rate = 10000;
 hist_spikes = cell(6, 1);
-signal_length = duration*bin_rate;                
+signal_length = duration*bin_rate;
 NFFT = 2^nextpow2(signal_length);
 f = bin_rate/2*linspace(0,1,NFFT/2+1);
 fft_spikes = cell(6, 1);
@@ -782,10 +783,10 @@ fft_spikes = cell(6, 1);
 
 for i = 1:6
     tp = datarun{i}.stimulus.params.TEMPORAL_PERIOD;
-    [DC{i}, F1{i}, F2{i}] = deal(zeros(length(id), length(tp)));
+    [DC{i}, F1{i}, F2{i}] = deal(zeros(length(id), length(tp)-4));
     for rgc = 1:length(id)
         if ~isempty(raster{i}{rgc})
-        for time = 1:length(tp)
+        for time = 1:length(tp)-4
             spikes = floor(raster_p_sum{i}{rgc}{time}*bin_rate);
             tmp_binned_spikes = zeros(1, signal_length);
             tmp_binned_spikes(spikes) = 1;
@@ -816,11 +817,26 @@ for i = 1:6
         F1{i}(rgc,:) = fund_power ./ max(DC_power);
         F2{i}(rgc,:) = sec_power ./ max(DC_power);
         DC{i}(rgc,:) = DC_power ./ max(DC_power);
-
+        clear fund_power sec_power DC_power
         end
         
     end
     ratio{i} = F2{i}./F1{i};
+    for ct = 1:4
+        ratio_dir{ct}{i} = ratio{i}(idx_dir_oo{ct}, :);
+        ratio_dir{ct}{i} = exciseRows_empty(ratio_dir{ct}{i});
+        ratio_dir_mean(i, ct, :) = mean(ratio_dir{ct}{i}, 1);
+        ratio_dir_ste(i, ct, :) = std(ratio_dir{ct}{i}, [], 1)/sqrt(size(ratio_dir{ct}{i}, 1));
+    end
+    for ct = 1:2
+        ratio_dir_on{ct}{i} = ratio{i}(idx_dir_on{ct}, :);
+        ratio_dir_on{ct}{i} = exciseRows_empty(ratio_dir_on{ct}{i});
+        ratio_dir_mean_on(i, ct, :) = mean(ratio_dir_on{ct}{i}, 1);
+        ratio_dir_ste_on(i, ct, :) = std(ratio_dir_on{ct}{i}, [], 1)/sqrt(size(ratio_dir_on{ct}{i}, 1));
+    end
+%     ratio{i} = exciseRows_empty(ratio{i});
+%     ratio_mean(i, :) = mean(ratio{i});
+%     ratio_ste(i, :) = std(ratio{i})/sqrt(size(ratio{i}, 1));
 end
 
 % plot 
@@ -1001,75 +1017,92 @@ figure
 set(gcf, 'DefaultLineLineWidth', 1.5)
 
 % type 1
-subplot(2, 2, 1)
-ratio_temp = ratio{2}(idx1, :);
-avg_temp = nanmean(ratio_temp);
-ste_temp = nanstd(ratio_temp)/sqrt(length(idx1));
+% subplot(2, 2, 1)
+% ratio_temp = ratio{2}(idx1, :);
+% avg_temp = nanmean(ratio_temp);
+% ste_temp = nanstd(ratio_temp)/sqrt(length(idx1));
+% errorbar(speed, avg_temp, ste_temp, 'b')
+% hold on
+% ratio_temp = ratio{5}(idx1, :);
+% avg_temp = nanmean(ratio_temp);
+% ste_temp = nanstd(ratio_temp)/sqrt(length(idx1));
+% errorbar(speed, avg_temp, ste_temp, 'r')
+% set(gca, 'XScale', 'log')
+% xlabel('speed')
+% ylabel('F2/F1')
+% title('SP120  on-off DSGC')
+% xlim([min(speed) max(speed)])
+% legend('NDF 3', 'NDF 0')
+speed = speed(1:5);
+subplot(1, 2, 1)
+ratio_temp = exciseRows_empty(ratio{3}(idx1, :));
+avg_temp = mean(ratio_temp);
+ste_temp = std(ratio_temp)/sqrt(size(ratio_temp, 1));
 errorbar(speed, avg_temp, ste_temp, 'b')
 hold on
-ratio_temp = ratio{5}(idx1, :);
-avg_temp = nanmean(ratio_temp);
-ste_temp = nanstd(ratio_temp)/sqrt(length(idx1));
-errorbar(speed, avg_temp, ste_temp, 'r')
-set(gca, 'XScale', 'log')
-xlabel('speed')
-ylabel('F2/F1')
-title('SP120  on-off DSGC')
-xlim([min(speed) max(speed)])
-legend('NDF 3', 'NDF 0')
-
-subplot(2, 2, 2)
-ratio_temp = ratio{3}(idx1, :);
-avg_temp = nanmean(ratio_temp);
-ste_temp = nanstd(ratio_temp)/sqrt(length(idx1));
-errorbar(speed, avg_temp, ste_temp, 'b')
-hold on
-ratio_temp = ratio{6}(idx1, :);
-avg_temp = nanmean(ratio_temp);
-ste_temp = nanstd(ratio_temp)/sqrt(length(idx1));
+ratio_temp = exciseRows_empty(ratio{6}(idx1, :));
+avg_temp = mean(ratio_temp);
+ste_temp = std(ratio_temp)/sqrt(size(ratio_temp, 1));
 errorbar(speed, avg_temp, ste_temp, 'r')
 set(gca, 'XScale', 'log')
 xlabel('speed')
 ylabel('F2/F1')
 title('SP240  on-off DSGC')
-xlim([min(speed) max(speed)])
+xlim([min(speed)-1 max(speed)+1])
 
 
 % type 2
-subplot(2, 2, 3)
-ratio_temp = ratio{2}(idx2, :);
-avg_temp = nanmean(ratio_temp);
-ste_temp = nanstd(ratio_temp)/sqrt(length(idx2));
-errorbar(speed, avg_temp, ste_temp, 'b')
-hold on
-ratio_temp = ratio{5}(idx2, :);
-avg_temp = nanmean(ratio_temp);
-ste_temp = nanstd(ratio_temp)/sqrt(length(idx2));
-errorbar(speed, avg_temp, ste_temp, 'r')
-set(gca, 'XScale', 'log')
-xlabel('speed')
-ylabel('F2/F1')
-title('SP120  on DSGC')
-xlim([min(speed) max(speed)])
+% subplot(2, 2, 3)
+% ratio_temp = ratio{2}(idx2, :);
+% avg_temp = nanmean(ratio_temp);
+% ste_temp = nanstd(ratio_temp)/sqrt(length(idx2));
+% errorbar(speed, avg_temp, ste_temp, 'b')
+% hold on
+% ratio_temp = ratio{5}(idx2, :);
+% avg_temp = nanmean(ratio_temp);
+% ste_temp = nanstd(ratio_temp)/sqrt(length(idx2));
+% errorbar(speed, avg_temp, ste_temp, 'r')
+% set(gca, 'XScale', 'log')
+% xlabel('speed')
+% ylabel('F2/F1')
+% title('SP120  on DSGC')
+% xlim([min(speed) max(speed)])
 
-subplot(2, 2, 4)
-ratio_temp = ratio{3}(idx2, :);
-avg_temp = nanmean(ratio_temp);
-ste_temp = nanstd(ratio_temp)/sqrt(length(idx2));
+subplot(1, 2, 2)
+ratio_temp = exciseRows_empty(ratio{3}(idx2, :));
+avg_temp = mean(ratio_temp);
+ste_temp = std(ratio_temp)/sqrt(size(ratio_temp, 1));
 errorbar(speed, avg_temp, ste_temp, 'b')
 hold on
-ratio_temp = ratio{6}(idx2, :);
-avg_temp = nanmean(ratio_temp);
-ste_temp = nanstd(ratio_temp)/sqrt(length(idx2));
+ratio_temp = exciseRows_empty(ratio{6}(idx2, :));
+avg_temp = mean(ratio_temp);
+ste_temp = std(ratio_temp)/sqrt(size(ratio_temp, 1));
 errorbar(speed, avg_temp, ste_temp, 'r')
 set(gca, 'XScale', 'log')
 xlabel('speed')
 ylabel('F2/F1')
 title('SP240  on DSGC')
-xlim([min(speed) max(speed)])
+xlim([min(speed)-1 max(speed)+1])
 
-
-
+% individual direction
+% on-off
+figure
+for ct = 1:4
+    subplot(2, 2, ct)
+    errorbar(v2, ratio_dir_mean(3, ct, :), ratio_dir_ste(3, ct, :), 'b')
+    hold on
+    errorbar(v2, ratio_dir_mean(6, ct, :), ratio_dir_ste(6, ct, :), 'r')
+    set(gca, 'XScale', 'log')
+end
+    
+figure
+for ct = 1:2
+    subplot(1, 2, ct)
+    errorbar(v2, ratio_dir_mean_on(3, ct, :), ratio_dir_ste_on(3, ct, :), 'b')
+    hold on
+    errorbar(v2, ratio_dir_mean_on(6, ct, :), ratio_dir_ste_on(6, ct, :), 'r')
+    set(gca, 'XScale', 'log')
+end
 %% full field pulses
 
 n = length(datarun{8}.triggers)/4;
@@ -1524,7 +1557,7 @@ dirn = 4;
 ct = 1;
 set(h, 'Position', [1 1 1080 500])
 subplot(1, 2, 1)
-idx_temp = idx1;
+idx_temp = idx2;
 compass(DS{d}.U{t}(idx_temp), DS{d}.V{t}(idx_temp))
 color = 'brgk';
 
@@ -1539,7 +1572,29 @@ for i = 1:dirn
     id_dir_oo{i} = id(idx_dir_oo{i});
 end
 
+d = 6;
+t = 3;
+h = figure;
+dirn = 2;
+ct = 1;
+set(h, 'Position', [1 1 1080 500])
+subplot(1, 2, 1)
+idx_temp = idx1;
+compass(DS{d}.U{t}(idx_temp), DS{d}.V{t}(idx_temp))
+color = 'brgk';
 
+for i = 1:dirn
+    hold on
+    [x, y] = ginput;
+    plot(x, y, color(i));
+
+    IN = inpolygon(DS{d}.U{t}(idx_temp), DS{d}.V{t}(idx_temp), x, y);
+    [~, I] = find(IN == 1);
+    idx_dir_on{i} = idx_temp(I);
+    id_dir_on{i} = id(idx_dir_on{i});
+end
+
+%
 p_direction = DS{d}.angle{t}';
 xx = 0:pi/4:7*pi/4;
 xx = repmat(xx, length(id), 1) - repmat(p_direction, 1, 8);
@@ -1613,3 +1668,123 @@ for i = 1:6
     xlabel('speed')
     ylabel('DSI')
 end
+
+%% DS tuning curves (drifting grating)
+% all ds cells
+% t = 2;
+dirn = 4;
+D = 6;
+T = 4;
+
+data_idx = [3 6];
+for d = 1:2
+    p_direction = DS{D}.angle{T}';
+    xx = 0:pi/4:7*pi/4;
+    xx = repmat(xx, length(id), 1) - repmat(p_direction, 1, 8);
+    xx(xx>pi) = xx(xx>pi)-2*pi;
+    xx(xx<-pi) = xx(xx<-pi)+2*pi;
+
+
+    subplot(1, 2, d)
+    for i = 1:dirn
+        for cc = 1:length(id)
+            if ~dg_idx(cc, d)
+            [xsort, seq] = sort(xx(cc, :));
+            y_temp = DS{data_idx(d)}.rho{T}(cc, :);
+            plot(xsort, y_temp(seq), 'b')
+            hold on
+            end
+        end
+    end
+    xlabel('direction (rad)')
+    ylabel('normalized response')
+    title(ll{data_idx(d)})
+    xlim([-pi pi])
+end
+
+%subtypes
+clear rho_dg_mean rho_dg_ste dsi_dg_mean dsi_dg_ste
+for d = 1:2
+    subplot(1, 2, d)
+    for i = 1:dirn
+        rho_dg{d}{i} = [];
+        dsi_dg{d}{i} = [];
+        for cc = 1:length(idx_dir_oo{i})
+            if ~dg_idx(idx_dir_oo{i}(cc), d) && sum(DS{data_idx(d)}.rho{T}(idx_dir_oo{i}(cc), :))>0
+            [xsort, seq] = sort(xx(idx_dir_oo{i}(cc), :));
+            y_temp = DS{data_idx(d)}.rho{T}(idx_dir_oo{i}(cc), :);
+            plot(xsort, y_temp(seq), color(i))
+            ylim([0 1])
+%             pause
+            hold on
+            rho_dg{d}{i} = [rho_dg{d}{i}; y_temp(seq)];
+            dsi_dg{d}{i} = [dsi_dg{d}{i}; DS{data_idx(d)}.dsindex{T}(idx_dir_oo{i}(cc))];
+            end
+        end
+        rho_dg_mean{d}(i, :) = mean(rho_dg{d}{i});
+        rho_dg_ste{d}(i, :) = std(rho_dg{d}{i})/sqrt(size(rho_dg{d}{i}, 1));
+        dsi_dg_mean{d}(i) = mean(dsi_dg{d}{i});
+        dsi_dg_ste{d}(i) = std(dsi_dg{d}{i})/sqrt(length(dsi_dg{d}{i}));
+    end
+    xlabel('direction (rad)')
+    ylabel('normalized response')
+    title(ll{d})
+    xlim([-pi pi])
+end
+dsi_dg_mean = cell2mat(dsi_dg_mean');
+dsi_dg_ste = cell2mat(dsi_dg_ste');
+% plot average (cell type)
+figure
+set(gcf, 'DefaultLineLineWidth', 1.5)
+for d = 1:2
+    subplot(1, 2, d)
+    for i = 1:dirn
+        errorbar(xsort, rho_dg_mean{d}(i, :), rho_dg_ste{d}(i, :), color(i));
+        hold on
+    end
+    xlabel('direction (rad)')
+    ylabel('normalized average response')
+    title(ll{data_idx(d)});
+end
+% legend(ct)
+
+% plot average (light level)
+figure
+set(gcf, 'DefaultLineLineWidth', 1.5)
+for i = 1:dirn
+    subplot(2, 2, i)
+    for d = 1:5
+        errorbar(xsort, rho_dg_mean{d}(i, :), rho_dg_ste{d}(i, :), color(d));
+        hold on
+    end
+    xlabel('direction (rad)')
+    ylabel('normalized average response')
+    title(ct{i})
+end
+legend(ll)
+% DSI
+FigHandle = figure;
+set(FigHandle, 'Position', [100, 100, 1000, 500]);
+
+xtick = ct;
+model_series = [dsi_dg_mean(1,1) dsi_dg_mean(2,1) dsi_dg_mean(3,1) dsi_dg_mean(4,1) dsi_dg_mean(5,1); dsi_dg_mean(1,2) dsi_dg_mean(2,2) dsi_dg_mean(3,2) dsi_dg_mean(4,2) dsi_dg_mean(5,2);dsi_dg_mean(1,3) dsi_dg_mean(2,3) dsi_dg_mean(3,3) dsi_dg_mean(4,3) dsi_dg_mean(5,3); dsi_dg_mean(1,4) dsi_dg_mean(2,4) dsi_dg_mean(3,4) dsi_dg_mean(4,4) dsi_dg_mean(5,4)];   
+model_error = [dsi_dg_ste(1,1) dsi_dg_ste(2,1) dsi_dg_ste(3,1) dsi_dg_ste(4,1) dsi_dg_ste(5,1); dsi_dg_ste(1,2) dsi_dg_ste(2,2) dsi_dg_ste(3,2) dsi_dg_ste(4,2) dsi_dg_ste(5,2);dsi_dg_ste(1,3) dsi_dg_ste(2,3) dsi_dg_ste(3,3) dsi_dg_ste(4,3) dsi_dg_ste(5,3); dsi_dg_ste(1,4) dsi_dg_ste(2,4) dsi_dg_ste(3,4) dsi_dg_ste(4,4) dsi_dg_ste(5,4)];
+h = bar(model_series);
+set(h,'BarWidth',1); % The bars will now touch each other
+
+set(gca,'XTicklabel',xtick)
+ylabel('DSI')
+legend('NDF4','NDF3', 'NDF2', 'NDF1', 'NDF0', 'location', 'northeast');
+hold on;
+
+numgroups = size(model_series, 1); 
+numbars = size(model_series, 2); 
+
+groupwidth = min(0.8, numbars/(numbars+1.5));
+
+for i = 1:numbars
+% Based on barweb.m by Bolu Ajiboye from MATLAB File Exchange
+x = (1:numgroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*numbars); % Aligning error bar with individual bar
+errorbar(x, model_series(:,i), model_error(:,i), 'k', 'linestyle', 'none');
+end
+

@@ -10,8 +10,8 @@ datarun{2} = load_data('/Analysis/xyao/2013-12-09-0/data002-map/data002-map', op
 datarun{2}.names.stimulus_path = '/Analysis/xyao/2013-12-09-0/stimuli/s02';
 datarun{2} = load_stim(datarun{2}, 'user_defined_trigger_interval', 10);
 
-datarun{3} = load_data('/Analysis/xyao/2013-12-09-0/data003-map/data003-map', opt);
-datarun{3}.names.stimulus_path = '/Analysis/xyao/2013-12-09-0/stimuli/s03';
+datarun{3} = load_data('/Volumes/Suk/Analysis/xyao/2013-12-09-0/data003-map/data003-map', opt);
+datarun{3}.names.stimulus_path = '/Volumes/Suk/Analysis/xyao/2013-12-09-0/stimuli/s03';
 datarun{3} = load_stim(datarun{3}, 'user_defined_trigger_interval', 10);
 
 datarun{4} = load_data('/Analysis/xyao/2013-12-09-0/data005-map/data005-map', opt);
@@ -29,8 +29,8 @@ datarun{6} = get_autocorrelations(datarun{6}, 'all');
 
 %% get DSGC ids
 
-[NumSpikesCell, StimComb] = get_spikescellstim(datarun{3},datarun{3}.cell_ids,0);
-[ds_struct] = dscellanalysis(NumSpikesCell, StimComb);
+[NumSpikesCell, ~,StimComb] = get_spikescellstim(datarun{3},datarun{3}.cell_ids,0, 1);
+ds_struct = dscellanalysis(NumSpikesCell, StimComb);
 
 % pull out DS cells
 

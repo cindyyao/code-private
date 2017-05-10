@@ -1,7 +1,7 @@
-dg_path = '/Analysis/xyao/2015-07-03-0/data012-map/data012-map';
-dg_stimulus_path = '/Analysis/xyao/2015-07-03-0/stimuli/s12.mat';
-wn_path = '/Analysis/xyao/2015-07-03-0/data016-map/data016-map';
-wn_nonmap_path = '/Analysis/xyao/2015-07-03-0/data016/data016';
+dg_path = '/Volumes/lab/analysis/2015-07-03-0/data012-map/data012-map';
+dg_stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s12.mat';
+wn_path = '/Volumes/lab/analysis/2015-07-03-0/data016-map/data016-map';
+wn_nonmap_path = '/Volumes/lab/analysis/2015-07-03-0/data016/data016';
 cd /Users/xyao/matlab/code-private/DS_new/
 
 %% load data
@@ -139,7 +139,14 @@ figure
 scatter3(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,2))
 
 % fit plane
-fit_plane
+dataX(:,1:2) = center_ei_display;
+dataX(:,3) = center_offset(:,1);
+dataY(:,1:2) = center_ei_display;
+dataY(:,3) = center_offset(:,2);
+
+[normal_x, meanX, pcaExplainedX, sseX] = fit_plane(dataX);
+[normal_y, meanY, pcaExplainedY, sseY] = fit_plane(dataY);
+
 
 %% get DS cell id
 % [NumSpikesCell, StimComb] = get_spikescellstim(datadg,datadg.cell_ids,0);
@@ -147,6 +154,7 @@ fit_plane
 % 
 % params_idx = input('indices of parameters for classification: (eg. [1 2])\n'); 
 % [ds_id, nonds_id] = classify_ds(datadg, ds_struct, params_idx);
+load('DS150703-1.mat')
 ds_idx = get_cell_indices(datadg, ds_id);
 
 %% get DS cell location
@@ -218,24 +226,58 @@ for i = 1:3
     legend('w correction', 'w/o correction')
 end
 
+%% manually correct center location if needed
+center_corrected = correct_ei_center_(datawn, ds_id, center_sta_ds_est*stixel_size_, stixel_size_) / stixel_size_;
 
+center_corrected = center_sta_ds_est;
 %% generate circular masks
 n = size(cell_location,1);
 radius = 3;
 masks = make_circular_masks(cell_location, ones(n,1)*radius, 60, 60, 10);
-
-
-
 dlmwrite('maptest.txt', masks{1},  'delimiter', '\t', 'newline', 'pc')
 
+%% plot mosaic
+
+corner_i = [4 126 195 264 386 455 4];
+corner_position = datadg.ei.position(corner_i, :);
+center_ds = tforminv(Tform, center_corrected * stixel_size_);
+radius = 75; % micron
 
 
 
+% on-off DSGC
+figure
+for ct = 1:4
+    subplot(2, 2, ct)
+    plot(corner_position(:, 1), corner_position(:, 2))
+    hold on
+    for i = 1:length(idx_dir{ct})
+        [x, y] = circle(center_ds(idx_dir{ct}(i), 1), center_ds(idx_dir{ct}(i), 2), radius);
+        plot(x, y, 'k')
+        hold on
+    end
+    xlim([-700 700])
+    ylim([-500 500])
+    axis off
+%     title(oo_ds{ct})
+end
+
+% on DSGC
+figure
+for ct = 1:3
+    subplot(2, 2, ct)
+    plot(corner_position(:, 1), corner_position(:, 2))
+    hold on
+    for i = 1:length(idx_dir_on{ct})
+        [x, y] = circle(center_ds(idx_dir_on{ct}(i), 1), center_ds(idx_dir{ct}(i), 2), radius);
+        plot(x, y, 'k')
+        hold on
+    end
+    xlim([-700 700])
+    ylim([-500 500])
+    axis off
+%     title(on_ds{ct})
+end
 
 
-%%
-figure(10)
-subplot(1,2,1)
 
-subplot(1,2,2)
-ginput()

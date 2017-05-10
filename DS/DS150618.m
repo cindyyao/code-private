@@ -35,20 +35,20 @@ opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 % datambw{5}.names.stimulus_path = '/Analysis/xyao/2015-06-18-0/stimuli/s17.mat';
 % datambw{5} = load_stim_matlab(datambw{5});
 
-datadg{1} = load_data('/Analysis/xyao/2015-06-18-0/data000-map017/data000-map', opt);
-datadg{1}.names.stimulus_path = '/Analysis/xyao/2015-06-18-0/stimuli/s00.mat';
+datadg{1} = load_data('/Volumes/lab/analysis/2015-06-18-0/data000-map017/data000-map', opt);
+datadg{1}.names.stimulus_path = '/Volumes/lab/analysis/2015-06-18-0/stimuli/s00.mat';
 datadg{1} = load_stim_matlab(datadg{1}, 'user_defined_trigger_interval', 10);
-datadg{2} = load_data('/Analysis/xyao/2015-06-18-0/data004-map017/data004-map', opt);
-datadg{2}.names.stimulus_path = '/Analysis/xyao/2015-06-18-0/stimuli/s04.mat';
+datadg{2} = load_data('/Volumes/lab/analysis/2015-06-18-0/data004-map017/data004-map', opt);
+datadg{2}.names.stimulus_path = '/Volumes/lab/analysis/2015-06-18-0/stimuli/s04.mat';
 datadg{2} = load_stim_matlab(datadg{2}, 'user_defined_trigger_interval', 10);
-datadg{3} = load_data('/Analysis/xyao/2015-06-18-0/data008-map017/data008-map', opt);
-datadg{3}.names.stimulus_path = '/Analysis/xyao/2015-06-18-0/stimuli/s08.mat';
+datadg{3} = load_data('/Volumes/lab/analysis/2015-06-18-0/data008-map017/data008-map', opt);
+datadg{3}.names.stimulus_path = '/Volumes/lab/analysis/2015-06-18-0/stimuli/s08.mat';
 datadg{3} = load_stim_matlab(datadg{3}, 'user_defined_trigger_interval', 10);
-datadg{4} = load_data('/Analysis/xyao/2015-06-18-0/data012-map017/data012-map', opt);
-datadg{4}.names.stimulus_path = '/Analysis/xyao/2015-06-18-0/stimuli/s12.mat';
+datadg{4} = load_data('/Volumes/lab/analysis/2015-06-18-0/data012-map017/data012-map', opt);
+datadg{4}.names.stimulus_path = '/Volumes/lab/analysis/2015-06-18-0/stimuli/s12.mat';
 datadg{4} = load_stim_matlab(datadg{4}, 'user_defined_trigger_interval', 10);
-datadg{5} = load_data('/Analysis/xyao/2015-06-18-0/data016-map017/data016-map', opt);
-datadg{5}.names.stimulus_path = '/Analysis/xyao/2015-06-18-0/stimuli/s16.mat';
+datadg{5} = load_data('/Volumes/lab/analysis/2015-06-18-0/data016-map017/data016-map', opt);
+datadg{5}.names.stimulus_path = '/Volumes/lab/analysis/2015-06-18-0/stimuli/s16.mat';
 datadg{5} = load_stim_matlab(datadg{5}, 'user_defined_trigger_interval', 10);
 
 datambw{1} = load_data('/Analysis/xyao/2015-06-18-0/data001-map017/data001-map', opt);
@@ -83,21 +83,21 @@ datambb{5} = load_data('/Analysis/xyao/2015-06-18-0/data018-map017/data018-map',
 datambb{5}.names.stimulus_path = '/Analysis/xyao/2015-06-18-0/stimuli/s18.mat';
 datambb{5} = load_stim_matlab(datambb{5});
 
-dataffp{1} = load_data('/Analysis/xyao/2015-06-18-0/data003-map017/data003-map', opt);
+dataffp{1} = load_data('/Volumes/lab/analysis/2015-06-18-0/data003-map017/data003-map', opt);
 dataffp{1}.triggers = dataffp{1}.triggers(2:end);
-dataffp{2} = load_data('/Analysis/xyao/2015-06-18-0/data007-map017/data007-map', opt);
+dataffp{2} = load_data('/Volumes/lab/analysis/2015-06-18-0/data007-map017/data007-map', opt);
 dataffp{2}.triggers = dataffp{2}.triggers(2:end);
-dataffp{3} = load_data('/Analysis/xyao/2015-06-18-0/data011-map017/data011-map', opt);
+dataffp{3} = load_data('/Volumes/lab/analysis/2015-06-18-0/data011-map017/data011-map', opt);
 dataffp{3}.triggers = dataffp{3}.triggers(2:end);
-dataffp{4} = load_data('/Analysis/xyao/2015-06-18-0/data015-map017/data015-map', opt);
+dataffp{4} = load_data('/Volumes/lab/analysis/2015-06-18-0/data015-map017/data015-map', opt);
 dataffp{4}.triggers = dataffp{4}.triggers(2:end);
-dataffp{5} = load_data('/Analysis/xyao/2015-06-18-0/data019-map017/data019-map', opt);
+dataffp{5} = load_data('/Volumes/lab/analysis/2015-06-18-0/data019-map017/data019-map', opt);
 dataffp{5}.triggers = dataffp{5}.triggers(2:end);
 %%
 
 n = 5; % number of datarun
 i = 5; % which datarun to use for classification
-[NumSpikesCell, StimComb] = get_spikescellstim(datadg{i},datadg{i}.cell_ids,0);
+[NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg{i},datadg{i}.cell_ids,0, 1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb);
 
 a = 3; b = 4; % which parameters to use for classification
@@ -123,6 +123,9 @@ N = [];
 p = [];
 X(:,1) = log(ds_struct.mag{a,1})';
 X(:,2) = log(ds_struct.mag{b,1})';
+% X(:,1) = ds_struct.mag{a,1}';
+% X(:,2) = ds_struct.mag{b,1}';
+
 [idx N p] = clustering_analysis_plots(X, 0,1, 2, 0, 1, 0, 0, 0,0, vc);
 
 ds_id = [];
@@ -135,7 +138,7 @@ nonds_id = datadg{i}.cell_ids(idx==1);
 load('DS150618.mat')
 [raster_dg, DG, ~, raster_p_sum, p_idx] = deal(cell(n, 1));
 for i = 1:n    
-    [NumSpikesCell, StimComb] = get_spikescellstim(datadg{i},ds_id,0);
+    [NumSpikesCell, ~,StimComb] = get_spikescellstim(datadg{i},ds_id,0,1);
     DG{i} = sort_direction(dscellanalysis(NumSpikesCell, StimComb));
     raster_dg{i} = get_ds_raster(datadg{i}, ds_id);
     for j = 1:length(raster_dg{i})
@@ -317,6 +320,9 @@ end
 %% full field pulses
 
 n_ffp = 5; % number of datarun
+bin_size = 0.1;
+XX = bin_size/2:bin_size:6-bin_size/2;
+
 
 [raster_ff, raster_ff_all] = deal(cell(n_ffp, 1));
 for d = 1:n_ffp
@@ -326,8 +332,23 @@ for d = 1:n_ffp
             raster_ff{d}{j} = [];
             raster_ff_all{d}{j} = [];
         end
+        step_raster = get_raster(raster_ff_all{d}{j}, [0 6], 'plot', 0);
+        hist_on = hist(step_raster{1}, XX);
+        hist_off = hist(step_raster{2}, XX);
+        ratio_ffp{d}(j) = max(hist_off)/max(hist_on);
     end
+    ratio_temp = ratio_ffp{d};
+    ratio_temp(isnan(ratio_temp)) = [];
+    ratio_ffp_avg(d) = mean(ratio_temp);
+    ratio_ffp_ste(d) = std(ratio_temp)/sqrt(length(ratio_temp));
 end
+
+figure
+errorbar([0:4], ratio_ffp_avg, ratio_ffp_ste)
+title('ffp off on ratio')
+xlabel('light level')
+ylabel('off on ratio')
+xlim([-0.5 4.5])
 
 for i = 1:length(ds_id) 
         FigHandle = figure;
@@ -610,7 +631,7 @@ dirn = 4;
 D = 5;
 T = 2;
 
-for d = [1 2 4]
+for d = 1:5
     p_direction = DG_cut{D}.angle{T}';
     xx = 0:pi/4:7*pi/4;
     xx = repmat(xx, length(ds_id), 1) - repmat(p_direction, 1, 8);
@@ -722,6 +743,7 @@ errorbar(x, model_series(:,i), model_error(:,i), 'k', 'linestyle', 'none');
 end
 
 %% frequency analysis
+clear ratio ratio_dir ratio_dir_mean ratio_dir_ste ratio_oo ratio_oo_mean ratio_oo_ste
 duration = 8;
 bin_rate = 10000;
 hist_spikes = cell(n, 1);
@@ -773,12 +795,13 @@ for i = 1:n
     for ct = 1:4
         ratio_dir{ct}{i} = ratio{i}(idx_dir{ct}, :);
         ratio_dir{ct}{i} = exciseRows(ratio_dir{ct}{i});
-        ratio_dir_mean(i, ct, :) = mean(ratio_dir{ct}{i});
-        ratio_dir_ste(i, ct, :) = std(ratio_dir{ct}{i})/sqrt(size(ratio_dir{ct}{i}, 1));
+        ratio_dir_mean(i, ct, :) = mean(ratio_dir{ct}{i}, 1);
+        ratio_dir_ste(i, ct, :) = std(ratio_dir{ct}{i}, [], 1)/sqrt(size(ratio_dir{ct}{i}, 1));
     end
-    ratio{i} = exciseRows(ratio{i});
-    ratio_mean(i, :) = mean(ratio{i});
-    ratio_ste(i, :) = std(ratio{i})/sqrt(size(ratio{i}, 1));
+    ratio_oo{i} = ratio{i}(idx_sub{2}, :);
+    ratio_oo{i} = exciseRows_empty(ratio_oo{i});
+    ratio_oo_mean(i, :) = mean(ratio_oo{i});
+    ratio_oo_ste(i, :) = std(ratio_oo{i})/sqrt(size(ratio_oo{i}, 1));
 end
 
 % plot average f2/f1
@@ -786,8 +809,8 @@ ct = {'superior', 'posterior', 'inferior', 'anterior'};
 figure
 set(gcf, 'DefaultLineLineWidth', 1.5)
 xtick = {'high speed'; 'low speed'};
-model_series = [ratio_mean(1,1) ratio_mean(2,1) ratio_mean(3,1) ratio_mean(4,1) ratio_mean(5,1); ratio_mean(1,2) ratio_mean(2,2) ratio_mean(3,2) ratio_mean(4,2) ratio_mean(5,2)];   
-model_error = [ratio_ste(1,1) ratio_ste(2,1) ratio_ste(3,1) ratio_ste(4,1) ratio_ste(5,1); ratio_ste(1,2) ratio_ste(2,2) ratio_ste(3,2) ratio_ste(4,2) ratio_ste(5,2)];
+model_series = ratio_oo_mean';
+model_error = ratio_oo_ste';
 h = bar(model_series);
 set(h,'BarWidth',1); % The bars will now touch each other
 
@@ -812,8 +835,8 @@ end
 figure
 set(gcf, 'DefaultLineLineWidth', 1.5)
 xtick = ct;
-model_series = [ratio_dir_mean(1,1,1) ratio_dir_mean(2,1,1) ratio_dir_mean(3,1,1) ratio_dir_mean(4,1,1) ratio_dir_mean(5,1,1); ratio_dir_mean(1,2,1) ratio_dir_mean(2,2,1) ratio_dir_mean(3,2,1) ratio_dir_mean(4,2,1) ratio_dir_mean(5,2,1); ratio_dir_mean(1,3,1) ratio_dir_mean(2,3,1) ratio_dir_mean(3,3,1) ratio_dir_mean(4,3,1) ratio_dir_mean(5,3,1); ratio_dir_mean(1,4,1) ratio_dir_mean(2,4,1) ratio_dir_mean(3,4,1) ratio_dir_mean(4,4,1) ratio_dir_mean(5,4,1)];   
-model_error = [ratio_dir_ste(1,1,1) ratio_dir_ste(2,1,1) ratio_dir_ste(3,1,1) ratio_dir_ste(4,1,1) ratio_dir_ste(5,1,1); ratio_dir_ste(1,2,1) ratio_dir_ste(2,2,1) ratio_dir_ste(3,2,1) ratio_dir_ste(4,2,1) ratio_dir_ste(5,2,1); ratio_dir_ste(1,3,1) ratio_dir_ste(2,3,1) ratio_dir_ste(3,3,1) ratio_dir_ste(4,3,1) ratio_dir_ste(5,3,1); ratio_dir_ste(1,4,1) ratio_dir_ste(2,4,1) ratio_dir_ste(3,4,1) ratio_dir_ste(4,4,1) ratio_dir_ste(5,4,1)];
+model_series = ratio_dir_mean(:, :, 1)';
+model_error = ratio_dir_ste(:, :, 1)';
 h = bar(model_series);
 set(h,'BarWidth',1); % The bars will now touch each other
 
@@ -838,8 +861,8 @@ end
 figure
 set(gcf, 'DefaultLineLineWidth', 1.5)
 xtick = ct;
-model_series = [ratio_dir_mean(1,1,2) ratio_dir_mean(2,1,2) ratio_dir_mean(3,1,2) ratio_dir_mean(4,1,2) ratio_dir_mean(5,1,2); ratio_dir_mean(1,2,2) ratio_dir_mean(2,2,2) ratio_dir_mean(3,2,2) ratio_dir_mean(4,2,2) ratio_dir_mean(5,2,2); ratio_dir_mean(1,3,2) ratio_dir_mean(2,3,2) ratio_dir_mean(3,3,2) ratio_dir_mean(4,3,2) ratio_dir_mean(5,3,2); ratio_dir_mean(1,4,2) ratio_dir_mean(2,4,2) ratio_dir_mean(3,4,2) ratio_dir_mean(4,4,2) ratio_dir_mean(5,4,2)];   
-model_error = [ratio_dir_ste(1,1,2) ratio_dir_ste(2,1,2) ratio_dir_ste(3,1,2) ratio_dir_ste(4,1,2) ratio_dir_ste(5,1,2); ratio_dir_ste(1,2,2) ratio_dir_ste(2,2,2) ratio_dir_ste(3,2,2) ratio_dir_ste(4,2,2) ratio_dir_ste(5,2,2); ratio_dir_ste(1,3,2) ratio_dir_ste(2,3,2) ratio_dir_ste(3,3,2) ratio_dir_ste(4,3,2) ratio_dir_ste(5,3,2); ratio_dir_ste(1,4,2) ratio_dir_ste(2,4,2) ratio_dir_ste(3,4,2) ratio_dir_ste(4,4,2) ratio_dir_ste(5,4,2)];
+model_series = ratio_dir_mean(:, :, 2)';
+model_error = ratio_dir_ste(:, :, 2)';
 h = bar(model_series);
 set(h,'BarWidth',1); % The bars will now touch each other
 

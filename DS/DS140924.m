@@ -2,23 +2,23 @@
 opt = struct('load_params', 1,'load_neurons', 1, 'load_ei', 1);
 
 % load data
-datarun{1} = load_data('/Analysis/xyao/2014-09-24-0/data000-map/data000-map', opt);
-datarun{1}.names.stimulus_path = '/Analysis/xyao/2014-09-24-0/stimuli/s00';
+datarun{1} = load_data('/Volumes/Suk/Analysis/xyao/2014-09-24-0/data000-map/data000-map', opt);
+datarun{1}.names.stimulus_path = '/Volumes/Suk/Analysis/xyao/2014-09-24-0/stimuli/s00';
 datarun{1} = load_stim(datarun{1}, 'user_defined_trigger_interval', 10);
 
-datarun{2} = load_data('/Analysis/xyao/2014-09-24-0/data002-map/data002-map', opt);
-datarun{2}.names.stimulus_path = '/Analysis/xyao/2014-09-24-0/stimuli/s02';
+datarun{2} = load_data('/Volumes/Suk/Analysis/xyao/2014-09-24-0/data002-map/data002-map', opt);
+datarun{2}.names.stimulus_path = '/Volumes/Suk/Analysis/xyao/2014-09-24-0/stimuli/s02';
 datarun{2} = load_stim(datarun{2}, 'user_defined_trigger_interval', 10);
 
-datarun{3} = load_data('/Analysis/xyao/2014-09-24-0/data004-map/data004-map', opt);
-datarun{3}.names.stimulus_path = '/Analysis/xyao/2014-09-24-0/stimuli/s04';
+datarun{3} = load_data('/Volumes/Suk/Analysis/xyao/2014-09-24-0/data004-map/data004-map', opt);
+datarun{3}.names.stimulus_path = '/Volumes/Suk/Analysis/xyao/2014-09-24-0/stimuli/s04';
 datarun{3} = load_stim(datarun{3}, 'user_defined_trigger_interval', 10);
 
-datarun{4} = load_data('/Analysis/xyao/2014-09-24-0/data006-map/data006-map', opt);
-datarun{4}.names.stimulus_path = '/Analysis/xyao/2014-09-24-0/stimuli/s06';
+datarun{4} = load_data('/Volumes/Suk/Analysis/xyao/2014-09-24-0/data006-map/data006-map', opt);
+datarun{4}.names.stimulus_path = '/Volumes/Suk/Analysis/xyao/2014-09-24-0/stimuli/s06';
 datarun{4} = load_stim(datarun{4}, 'user_defined_trigger_interval', 10);
 
-[NumSpikesCell, StimComb] = get_spikescellstim(datarun{3},datarun{3}.cell_ids,0);
+[NumSpikesCell, ~, StimComb] = get_spikescellstim(datarun{3},datarun{3}.cell_ids,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb);
 
 % pull out DS cells

@@ -2,7 +2,7 @@ clear all
 clc
 close all
 
-datarun = load_data('/lab/Experiments/Array/Analysis/2013-02-21-0/data004/data004');
+datarun = load_data('/Volumes/lab/Experiments/Array/Analysis/2013-02-21-0/data004/data004');
 datarun = load_neurons(datarun);
 interval_time = .05;
 
@@ -20,7 +20,7 @@ for i = 1:cell_numb
     datarun.spikes{i,2} = spike2_time;
 end
 
-movie_path = '/lab/acquisition/movie-xml/BW-15-2-0.48-11111-40x40-60.35.xml';
+movie_path = '/Volumes/lab/acquisition/movie-xml/BW-15-2-0.48-11111-40x40-60.35.xml';
 display_frame_rate = 60.35;
 movie_refresh = 2;
 movie_frame_rate = display_frame_rate / movie_refresh;
@@ -43,7 +43,7 @@ end
 
 
 for k = 1:2
-    for i = 1:cell_numb
+    for i = 1:5 %cell_numb
         spike_time = datarun.spikes{i, k};
         spike_time = spike_time(spike_time>frame_time(depth)& spike_time<=datarun.triggers(end)); 
         % make sure can get enough frames preceding the spike
@@ -69,7 +69,7 @@ end
 save('STA2.mat', 'STA')
 
 figure;
-cell_n = 3;
+cell_n = 25;
 % time course difference: 3, 25
 % amplitude difference: 1, 2, 4, 6
 % 5

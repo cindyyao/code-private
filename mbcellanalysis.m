@@ -78,11 +78,13 @@ MAG(:,i) = MAG1;
 magmax(i,:) = max_allspeeds(mag1);
 magave(i,:) = max_avespeeds(mag1);
 
+prefer = preferangle(rho1, angle1, theta1);
 null = nullmin(rho1);
 %null = nullopp(rho1, angle1, theta1);
 
 %dsindex1 = [];
-dsindex1 = DS_index_one(mag1, null);
+dsindex1 = DS_index_one(prefer, null);
+% dsindex1 = DS_index_one(mag1, null);
 %dsindex1 = DS_index_two(mag1, null);
 
 dsindex(:,i) = dsindex1;

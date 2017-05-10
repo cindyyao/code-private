@@ -71,12 +71,13 @@ for tt = 1:length(cell_types)
     color = colors(mod(tt - 1,length(colors))+1);
 end
 
+
 %% 
 
-screen_size = [14 14];
-name = 'on_mosaic_from_corrected_ei';
-for i =2:2
-%     name = num2str(i+4);
+screen_size = [8 8];
+% name = 'ON-transient-438-ndf1';
+for i = 2:2
+    name =num2str(i);
     set(figure(i), 'paperpositionmode', 'auto');
     % set(figure(1), 'PaperPosition', [-0.5 -0.25 22 10]);
     set(gcf, 'PaperUnits', 'inch');
@@ -85,13 +86,12 @@ for i =2:2
     saveas(figure(i), name, 'fig')
 end
 
+
 %%
 for i = 1:1
     h = figure(i);
     saveas(gcf, 'output','png')
 end
-    
-
 %%
 
 inpolygon
@@ -104,3 +104,8 @@ i = 2;
 % set(figure(i), 'paperpositionmode', 'auto');
 % set(figure(i), 'PaperSize', 'auto');
 print(figure(i), '-dpdf', 'vector_sum_plot')
+
+%%
+legend([h(1), h(2), h(3), h(4), h(5)], 'superior', 'anterior', 'inferior', 'posterior', 'ON')
+
+

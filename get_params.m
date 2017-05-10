@@ -1,0 +1,25 @@
+function params = get_params(datarun, id)
+idx = get_cell_indices(datarun, id);
+fit_temp = datarun.matlab.sta_fits{idx};
+params(1) = fit_temp.center_point_x;
+params(2) = fit_temp.center_point_y;
+params(3) = fit_temp.center_sd_x;
+params(4) = fit_temp.center_sd_y;
+params(5) = fit_temp.center_rotation_angle;
+params(6) = fit_temp.color_weight_a;
+params(7) = fit_temp.color_weight_b;
+params(8) = fit_temp.color_weight_c;
+params(9) = fit_temp.x_dim;
+params(10) = fit_temp.y_dim;
+params(11) = fit_temp.num_colors;
+params(12) = fit_temp.fit_surround;
+params(13) = fit_temp.surround_sd_scale;
+params(14) = fit_temp.surround_amp_scale;
+params(15) = fit_temp.scale_one;
+params(16) = fit_temp.scale_two;
+params(17) = fit_temp.tau_one;
+params(18) = fit_temp.tau_two;
+params(19) = fit_temp.n_filters;
+params(20) = fit_temp.frame_number;
+params(21) = fit_temp.rmse;
+end

@@ -38,17 +38,29 @@ for k = 1:length(cellids)
     for j = 1: length(datarun.stimulus.triggers)
         if(j == length(datarun.stimulus.triggers))
             Spikes_idx = datarun.spikes{i,1} >= datarun.stimulus.triggers(1,j) &datarun.spikes{i,1} < timedur;
+%             Spikes_idx = datarun.spikes{i,1} >= datarun.stimulus.triggers(j) &datarun.spikes{i,1} < timedur;
             Spikes_temp = datarun.spikes{i,1}(Spikes_idx);
             Spikes_temp = Spikes_temp - datarun.stimulus.triggers(1,j);
+%             Spikes_temp = Spikes_temp - datarun.stimulus.triggers(j);
             NumSpikesAll(1, j) = sum(Spikes_idx);
-            MaxRateAll(1, j) = max(histc(Spikes_temp, edges));
+            h = histc(Spikes_temp, edges);
+            if isempty(h)
+                h = zeros(size(h, 1),1);
+            end
+            MaxRateAll(1, j) = max(h)/bin_size;
         else
             Spikes_idx = datarun.spikes{i,1} >= datarun.stimulus.triggers(1,j) &datarun.spikes{i,1} < datarun.stimulus.triggers(1,j+1);
+%             Spikes_idx = datarun.spikes{i,1} >= datarun.stimulus.triggers(j) &datarun.spikes{i,1} < datarun.stimulus.triggers(j+1);
             Spikes_temp = datarun.spikes{i,1}(Spikes_idx);
             Spikes_temp = Spikes_temp - datarun.stimulus.triggers(1,j);
+%             Spikes_temp = Spikes_temp - datarun.stimulus.triggers(j);
             NumSpikesAll(1, j) = sum(Spikes_idx);
-            MaxRateAll(1, j) = max(histc(Spikes_temp, edges)); 
-        end 
+            h = histc(Spikes_temp, edges);
+            if isempty(h)
+                h = zeros(size(h, 1),1);
+            end
+            MaxRateAll(1, j) = max(h)/bin_size;
+        end
     end
     NumSpikesCell(k,:) = grpstats(NumSpikesAll,datarun.stimulus.trial_list,'mean')';
     MaxRate(k,:) = grpstats(MaxRateAll,datarun.stimulus.trial_list,'mean')';

@@ -3,6 +3,8 @@ function datarun = load_stim(datarun,varargin)
 %greschner
 %sravi - 03-2014 - modified function to be compatible with newer version of
                    %matlab (textscan function not reading the string in stimulus file - use fileread)
+%xyao - 08-2016 - modified function to be able to read BACK_RGB and RGB as
+                   %variable parameters
 
 % SET UP OPTIONAL ARGUMENTS
     p = inputParser;
@@ -136,12 +138,12 @@ clear s
                     %gdf modified this 'else' statement: Martin's old code
                     %is commented out below. 2013-04-22
                     % get parameter values
-                    temp_vals = zeros(1,length(s.combinations));
-                    for cnd = 1:length(s.combinations);
-                        temp_vals(cnd) = s.combinations(cnd).(t{j})(1);
-                    end
-                    temp_vals = sort(temp_vals, 'ascend');
-                    s.params.(t{j}) = temp_vals;
+%                     temp_vals = zeros(1,length(s.combinations));
+%                     for cnd = 1:length(s.combinations);
+%                         temp_vals(cnd) = s.combinations(cnd).(t{j})(1);
+%                     end
+%                     temp_vals = sort(temp_vals, 'ascend');
+%                     s.params.(t{j}) = temp_vals;
                         
                     % martin's old code -- gdf doesn't think it does the
                     % right thing
@@ -157,6 +159,13 @@ clear s
 %                             s.combinations(jj).(t{j})(jj,:)=s.params.(t{j});
 %                         end
 %                     end
+                    % xy modified the else statement. Works for rgb and
+                    % back_rgb
+                    for cnd = 1:length(s.combinations)
+                        temp(cnd,:) = s.combinations(cnd).(t{j});
+                    end
+                    s.params.(t{j}) = unique(temp, 'rows');
+                    s.params.(t{j}) = mat2cell(s.params.(t{j}), ones(size(s.params.(t{j}), 1), 1), size(s.params.(t{j}), 2))';
                  end
             end
             

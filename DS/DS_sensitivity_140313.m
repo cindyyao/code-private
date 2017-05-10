@@ -1,21 +1,20 @@
 opt = struct('load_params', 1,'load_neurons', 1, 'load_ei', 1);
 
 % load data
-datarun{1} = load_data('/Analysis/xyao/2014-03-13-0/data000-001-map/data000-001-map', opt);
-datarun{2} = load_data('/Analysis/xyao/2014-03-13-0/data004-map/data004-map', opt);
-datarun{2}.names.stimulus_path = '/Analysis/xyao/2014-03-13-0/stimuli/s04';
+datarun{1} = load_data('/Volumes/Suk/Analysis/xyao/2014-03-13-0/data000-001-map/data000-001-map', opt);
+datarun{2} = load_data('/Volumes/Suk/Analysis/xyao/2014-03-13-0/data004-map/data004-map', opt);
+datarun{2}.names.stimulus_path = '/Volumes/Suk/Analysis/xyao/2014-03-13-0/stimuli/s04';
 datarun{2} = load_stim(datarun{2}, 'user_defined_trigger_interval', 10);
-datarun{3} = load_data('/Analysis/xyao/2014-03-13-0/data003/data003', opt);
+datarun{3} = load_data('/Volumes/Suk/Analysis/xyao/2014-03-13-0/data003/data003', opt);
 
 
-[NumSpikesCell, StimComb] = get_spikescellstim(datarun{2},datarun{2}.cell_ids,0);
-[mag MAG dsindex magmax magave angle rho RHO theta num U V] = dscellanalysis(NumSpikesCell, StimComb);
-DS = v2struct(mag, MAG, dsindex, magmax, magave, angle, rho, RHO, theta, num, U, V);
+[NumSpikesCell, ~, StimComb] = get_spikescellstim(datarun{2},datarun{2}.cell_ids,0, 1);
+ds_struct = dscellanalysis(NumSpikesCell, StimComb);
 
 % pull out DS cells
 
 figure
-plot(mag{1, 1}, mag{2, 1}, 'o')
+plot(ds_struct.mag{1, 1}, ds_struct.mag{2, 1}, 'o')
 title('vector sum plot')
 xlabel('TP 32')
 ylabel('TP 128')
@@ -24,7 +23,7 @@ hold on
 [x, y] = ginput;
 plot(x, y);
 
-IN = inpolygon(mag{1, 1}, mag{2, 1}, x, y);
+IN = inpolygon(ds_struct.mag{1, 1}, ds_struct.mag{2, 1}, x, y);
 [~, I] = find(IN == 1);
 id = datarun{2}.cell_ids(I);
 

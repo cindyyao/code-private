@@ -1,9 +1,9 @@
-datarun = load_data('/lab/Experiments/Array/Analysis/2013-02-21-0/data004/data004');
+datarun = load_data('/Volumes/lab/Experiments/Array/Analysis/2013-02-21-0/data004/data004');
 datarun = load_neurons(datarun);
 interval = 0.01;
 cell_numb = length(datarun.cell_ids);
 
-movie_path = '/lab/acquisition/movie-xml/BW-15-2-0.48-11111-40x40-60.35.xml';
+movie_path = '/Volumes/lab/acquisition/movie-xml/BW-15-2-0.48-11111-40x40-60.35.xml';
 display_frame_rate = 60.35;
 movie_refresh = 2;
 movie_frame_rate = display_frame_rate / movie_refresh;
@@ -24,7 +24,7 @@ two_cell_spike = cell(cell_numb, cell_numb);
 two_cell_sta = cell(cell_numb, cell_numb);
 
 load cell_pair.mat
-for k = 1:25
+for k = 1:1
     cell_1 = find(datarun.cell_ids == cell_pair(k, 1));
     cell_2 = find(datarun.cell_ids == cell_pair(k, 2));
     % on brisk-transient cell pairs:
@@ -90,7 +90,7 @@ for k = 1:25
     two_cell_sta{cell_1, cell_2} = sta;  
     two_cell_sta{cell_2, cell_1} = sta; 
     
-    save('two_cell_temp.mat', 'two_cell_spike', 'two_cell_sta')
+%     save('two_cell_temp.mat', 'two_cell_spike', 'two_cell_sta')
     
     fprintf(num2str(k))
 end

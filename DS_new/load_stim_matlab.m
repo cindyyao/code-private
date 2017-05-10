@@ -46,7 +46,7 @@ else
 end
 
 datarun.stimulus.triggers = triggers';
-trial_n = length(stim_out.trials);
+trial_n = length(stim_out.trial_list);
 
 if (strcmp(stim_out.type, 'MG') || strcmp(stim_out.type, 'CG'))
     datarun.stimulus.params.SPATIAL_PERIOD = stim_out.spatial_period;
@@ -65,6 +65,12 @@ if (strcmp(stim_out.type, 'MG') || strcmp(stim_out.type, 'CG'))
     datarun.stimulus.trials = trials;
     datarun.stimulus.combinations = trials(1:trial_n/stim_out.repeats);
 elseif (strcmp(stim_out.type, 'MB'))
+    if isfield(stim_out,'x_start')
+        datarun.stimulus.x_start = stim_out.x_start;
+        datarun.stimulus.x_end = stim_out.x_end;
+        datarun.stimulus.y_start = stim_out.y_start;
+        datarun.stimulus.y_end = stim_out.y_end;
+    end
     datarun.stimulus.params.BAR_WIDTH = stim_out.bar_width;
     datarun.stimulus.params.DELTA = stim_out.delta;
     datarun.stimulus.params.DIRECTION = stim_out.direction;
@@ -80,7 +86,21 @@ elseif (strcmp(stim_out.type, 'MB'))
     end
     datarun.stimulus.trials = trials;
     datarun.stimulus.combinations = trials(1:trial_n/stim_out.repeats);
-else
-    fprintf('\t stimulus need to be Moving Bar, Moving Grating or Conterphase Grating. \n');
-    return
+% elseif (strcmp(stim_out.type, 'MS'))
+%     datarun.stimulus.x_vertices = stim_out.x_vertices_all;
+%     datarun.stimulus.y_vertices = stim_out.y_vertices_all;
+% else
+%     fprintf('\t stimulus type not recognized. \n');
+%     return
+end
+
+if length(datarun.stimulus.trial_list) ~= length(datarun.stimulus.triggers)
+    disp(sprintf('!!!!!!!!!!!!\n load_stim: ERROR %d triggers - %d stimuli\n!!!!!!!!!!!!',length(datarun.stimulus.triggers), length(datarun.stimulus.trial_list)));
+    trepeats=floor(length(datarun.stimulus.triggers)/length(datarun.stimulus.combinations));
+    disp(sprintf('\n asume run ended early  delete last repetions: %d rep -> %d rep\n',datarun.stimulus.repetitions, trepeats)); 
+    datarun.stimulus.repetitions=trepeats;
+    datarun.stimulus.trials=datarun.stimulus.trials(1:datarun.stimulus.repetitions*length(datarun.stimulus.combinations));
+    datarun.stimulus.trial_list=datarun.stimulus.trial_list(1:datarun.stimulus.repetitions*length(datarun.stimulus.combinations));
+    datarun.stimulus.triggers=datarun.stimulus.triggers(1:datarun.stimulus.repetitions*length(datarun.stimulus.combinations));
+
 end

@@ -136,7 +136,7 @@ FigHandle = figure;
 set(FigHandle, 'Position', [1 1 380 400])
 
 [~,scores,~,~] = princomp(mag_pca);
-pc1 = 1; pc2 = 3;
+pc1 = 1; pc2 = 2;
 plot(scores(:, pc1), scores(:, pc2), 'o')
 hold on
 for i = 1:2

@@ -440,6 +440,8 @@ end
 %% ffp
 
 n_ffp = 5;
+bin_size = 0.1;
+XX = bin_size/2:bin_size:6-bin_size/2;
 
 [raster_ff, raster_ff_all] = deal(cell(n_ffp, 1));
 for d = 1:n_ffp
@@ -449,10 +451,24 @@ for d = 1:n_ffp
             raster_ff{d}{j} = [];
             raster_ff_all{d}{j} = [];
         end
+        step_raster = get_raster(raster_ff_all{d}{j}, [0 6], 'plot', 0);
+        hist_on = hist(step_raster{1}, XX);
+        hist_off = hist(step_raster{2}, XX);
+        ratio_ffp{d}(j) = max(hist_off)/max(hist_on);
     end
+    ratio_temp = ratio_ffp{d};
+    ratio_temp(isnan(ratio_temp)) = [];
+    ratio_ffp_avg(d) = mean(ratio_temp);
+    ratio_ffp_ste(d) = std(ratio_temp)/sqrt(length(ratio_temp));
 end
 
-for i = 1:length(ds_id) 
+figure
+errorbar(ratio_ffp_avg, ratio_ffp_ste)
+title('ffp off on ratio')
+xlabel('light level')
+ylabel('off on ratio')
+
+for i = 1:1%length(ds_id) 
 %     if ~isempty(raster_ff{1}{i}) || ~isempty(raster_ff{2}{i})
         FigHandle = figure;
         set(FigHandle, 'Position', [1 1 1800 800])
@@ -466,6 +482,7 @@ for i = 1:length(ds_id)
 %     end
 end
 
+    
 %% Classify ON and ON-OFF
 % bin_size = 0.5 second
 MB_maxrate = cell(n, 1);
@@ -531,7 +548,7 @@ end
 xlabel('1st Principal Component')
 ylabel('2nd Principal Component')
 
-% frequency analysis
+%% frequency analysis
     
 duration = 8;
 bin_rate = 10000;
@@ -583,11 +600,11 @@ for i = 1:n
     ratio{i} = F2{i}./F1{i};
     for ct = 1:4
         ratio_dir{ct}{i} = ratio{i}(idx_dir{ct}, :);
-        ratio_dir{ct}{i} = exciseRows(ratio_dir{ct}{i});
+        ratio_dir{ct}{i} = exciseRows_empty(ratio_dir{ct}{i});
         ratio_dir_mean(i, ct, :) = mean(ratio_dir{ct}{i});
         ratio_dir_ste(i, ct, :) = std(ratio_dir{ct}{i})/sqrt(size(ratio_dir{ct}{i}, 1));
     end
-    ratio{i} = exciseRows(ratio{i});
+    ratio{i} = exciseRows_empty(ratio{i});
     ratio_mean(i, :) = mean(ratio{i});
     ratio_ste(i, :) = std(ratio{i})/sqrt(size(ratio{i}, 1));
 end
@@ -670,6 +687,29 @@ for i = 1:numbars
 x = (1:numgroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*numbars); % Aligning error bar with individual bar
 errorbar(x, model_series(:,i), model_error(:,i), 'k', 'linestyle', 'none');
 end
+
+% p value
+
+for i = 1:n
+    for j = 1:n        
+        for time = 1:length(tp)
+            [~, p] = ttest2(ratio{i}(:, time), ratio{j}(:, time));
+            P_all(i, j, time) = p;
+            for ct = 1:4
+                [~, p] = ttest2(ratio_dir{ct}{i}(:, time), ratio_dir{ct}{j}(:, time));
+                P_dir{ct}(i,j,time) = p;
+            end
+        end
+    end
+end
+% curve with errorbar
+t = 2;
+figure
+for ct = 1:4
+    errorbar(ratio_dir_mean(:, ct, t), ratio_dir_ste(:, ct, t), '--')
+    hold on 
+end
+errorbar(ratio_mean(:, t), ratio_ste(:, t))
 
 %% frequency doubling of moving bar response
 

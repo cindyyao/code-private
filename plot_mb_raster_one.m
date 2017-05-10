@@ -18,34 +18,34 @@ repeats = size(raster{1}{ii}, 5);
 idx = permute(reshape(idx', [9,y,x]), [3, 2, 1]);
 for time = 1:tpn
     FigHandle = figure;
-%     set(FigHandle, 'Position', [1 1 600 600])
+    set(FigHandle, 'Position', [1 1 600 600])
 %     set(FigHandle, 'Position', [1 1 1400 600])
-    set(FigHandle, 'Position', [1 1 1620 1080])
+%     set(FigHandle, 'Position', [1 1 1620 1080])
 %     set(FigHandle, 'Position', [1 1 1080 1080])
     for bw = 1:bwn
-        for cl = 1:cln
+%         for cl = 1:cln
             
             for j = 1:length(MB)
                 if ~isempty(raster{j}{cell_idx}) && time <= length(MB{j}.rho)
-                    h = subplot(xx, yy, idx(cl,bw,1)); polar(tt, MB{j}.rho{time, bw, cl}(cell_idx, :), color(j));
+                    h = subplot(xx, yy, idx(bw,1)); polar(tt, MB{j}.rho{time, bw}(cell_idx, :), color(j));
                     polar_theta_off(h)
                     hold on
                     for i = 2:9
-                        subplot(xx, yy, idx(cl,bw,i)); 
-                        plot_raster(squeeze(raster{j}{cell_idx}(bw, time, i-1, cl, :)), 0, trial_dur{j}(time, bw), 'color', color(j), 'first_trial', repeats*(j-1)+1)
+                        subplot(xx, yy, idx(bw,i)); 
+                        plot_raster(squeeze(raster{j}{cell_idx}(bw, time, i-1, :)), 0, trial_dur{j}(time, bw), 'color', color(j), 'first_trial', repeats*(j-1)+1)
                         hold on
-                        if i == 4
-                            title(Title{cl, bw})
-                        end 
-                        if mod(idx(cl,bw,i), yy) == 1
+%                         if i == 4
+%                             title(Title{bw})
+%                         end 
+                        if mod(idx(bw,i), yy) == 1
                             ylabel('trial number')
                         end
-                        if idx(cl,bw,i) > yy*(xx-1)
+                        if idx(bw,i) > yy*(xx-1)
                             xlabel('time (s)')
                         end
                     end
                 end
-            end
+%             end
         end
     end
      

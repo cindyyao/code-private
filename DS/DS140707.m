@@ -6,8 +6,8 @@ datarun{1} = load_data('/Analysis/xyao/2014-07-07-0/data001-map/data001-map', op
 datarun{1}.names.stimulus_path = '/Analysis/xyao/2014-07-07-0/stimuli/s01';
 datarun{1} = load_stim(datarun{1}, 'user_defined_trigger_interval', 10);
 
-datarun{2} = load_data('/Analysis/xyao/2014-07-07-0/data002-map/data002-map', opt);
-datarun{2}.names.stimulus_path = '/Analysis/xyao/2014-07-07-0/stimuli/s02';
+datarun{2} = load_data('/Volumes/lab/analysis/2014-07-07-0/data002-map/data002-map', opt);
+datarun{2}.names.stimulus_path = '/Volumes/lab/analysis/2014-07-07-0/stimuli/s02';
 datarun{2} = load_stim(datarun{2}, 'user_defined_trigger_interval', 10);
 % datarun{2} = get_autocorrelations(datarun{2}, id);
 
@@ -35,7 +35,7 @@ datarun{10} = load_data('/Analysis/xyao/2014-07-07-0/data007-map/data007-map', o
 % datarun{10} = get_autocorrelations(datarun{10}, intersect(id, datarun{10}.cell_ids));
 %% 
 
-[NumSpikesCell, StimComb] = get_spikescellstim(datarun{2},datarun{2}.cell_ids,0);
+[NumSpikesCell, ~, StimComb] = get_spikescellstim(datarun{2},datarun{2}.cell_ids,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb);
 
 % pull out DS cells

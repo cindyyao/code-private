@@ -15,7 +15,7 @@ for rgc = 1:length(cell_id)
     if ismember(cell_id(rgc), datarun.cell_ids)
     idx = get_cell_indices(datarun, cell_id(rgc));
     spike = datarun.spikes{idx};
-    raster = get_raster(spike, triggers, 'stop', 8,'plot', false);
+    raster = get_raster(spike, triggers, 'stop', [],'plot', false);
     raster_all{rgc} = raster(index);
     end
 end

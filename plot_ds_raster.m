@@ -12,27 +12,27 @@ tpn = size(raster{1}{ii}, 2);
 tt = DS{1}.theta{1}(1, :);
 for time = 1:tpn
     FigHandle = figure;
-%      set(FigHandle, 'Position', [1 1 600 600])
+    set(FigHandle, 'Position', [1 1 800 800])
 %     set(FigHandle, 'Position', [1 1 1400 600])
-    set(FigHandle, 'Position', [1 1 1620 1080])
+%     set(FigHandle, 'Position', [1 1 1620 1080])
 %     set(FigHandle, 'Position', [1 1 1080 1080])
     for j = 1:length(DS)
         if ~isempty(raster{j}{cell_idx}) && time <= length(DS{j}.rho)
             h = subplot(xx, yy, idx(j, 1)); 
             u_temp = DS{j}.U{end-time+1}(cell_idx);
             v_temp = DS{j}.V{end-time+1}(cell_idx);
-            alim = max(sqrt(u_temp^2+v_temp^2), 1);
+            alim = max(sqrt(u_temp^2+v_temp^2), 3);
             P = polar(0, alim);
             set(P, 'Visible', 'off')
             hold on
             compass(DS{j}.U{end-time+1}(cell_idx), DS{j}.V{end-time+1}(cell_idx), 'r');
-            polar(tt, DS{j}.rho{end-time+1}(cell_idx, :));
+            polar(tt, DS{j}.rho{end-time+1}(cell_idx, :), 'b');
             polar_theta_off(h)
             for i = 2:9
                 subplot(xx, yy, idx(j, i)); plot_raster(squeeze(raster{j}{cell_idx}(1, end-time+1, i-1, :)), 0, 8)
-                if i == 4
-                    title(Title{j})
-                end 
+%                 if i == 4
+%                     title(Title{j})
+%                 end 
                 if mod(idx(j, i), yy) == 1
                     ylabel('trial number')
                 end

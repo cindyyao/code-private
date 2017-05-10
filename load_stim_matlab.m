@@ -21,7 +21,11 @@ else
     return
 end
 
+current_path = pwd;
+cd('/Users/xyao/Field-lab/Photons/Classes')
 load(stim_path)
+cd(current_path)
+
 datarun.stimulus.repetitions = stim_out.repeats;
 datarun.stimulus.trial_list = stim_out.trial_list;
 
@@ -46,7 +50,7 @@ else
 end
 
 datarun.stimulus.triggers = triggers';
-trial_n = length(stim_out.trials);
+trial_n = length(stim_out.trial_list);
 
 if (strcmp(stim_out.type, 'MG') || strcmp(stim_out.type, 'CG'))
     datarun.stimulus.params.SPATIAL_PERIOD = stim_out.spatial_period;

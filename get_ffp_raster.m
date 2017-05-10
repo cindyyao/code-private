@@ -1,9 +1,9 @@
 function [raster, raster_all] = get_ffp_raster(datarun, cell_id, duration)
 
-n = length(datarun.triggers)/4;
+n = length(datarun.triggers)/4-1;
 trigger = zeros(1, n);
 for i = 1:n
-    trigger(i) = datarun.triggers(4*(i-1)+1);
+    trigger(i) = datarun.triggers(4*i+1);
 end
 % trigger = trigger - duration/2;
 
