@@ -1,5 +1,8 @@
-cd /Users/xyao/matlab/code-private/DS_new
-path = '/Users/xyao/Field-lab/data/2019-08-02-0/';
+% cd /Users/xyao/matlab/code-private/DS_new
+% path = '/Users/xyao/Field-lab/data/2019-08-02-0/';
+
+cd /Volumes/dusom_fieldlab/All_Staff/lab/Development/matlab/private/xyao/matlab/code/DS_new
+path = '/Volumes/dusom_fieldlab/All_Staff/lab/Experiments/Array/Analysis/2019-08-02-0/';
 
 datapath = strcat(path, 'data004/data004');
 stimpath = strcat(path, 'stimuli/s04.txt');
