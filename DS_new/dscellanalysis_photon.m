@@ -46,7 +46,9 @@ for i = 1:length(spperiods)
     NumSpikesCell2 = NumSpikesCell(:,inn);
     StimComb2 = StimComb(inn',:);
     
+% [rho1, theta1, num_t] = get_rhotheta(NumSpikesCell2, StimComb2);
 [rho1, theta1, num_t, num_c] = get_rhotheta(NumSpikesCell2, StimComb2,datarun);
+
 RHO1 = rho1;
 %[rho1 theta1] = normalize_zerodirection(rho1, theta1);
 [rho1, theta1] = normalize_maxspikes(rho1, theta1);

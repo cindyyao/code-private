@@ -1,7 +1,7 @@
  function [F, G] = fit_mm(xdata, ydata, varargin)
 
 p = inputParser;
-p.addParamValue('Upper', [0.5, 10000, max(xdata)]);
+p.addParamValue('Upper', [0.5, 100, max(xdata)]);
 p.addParamValue('Lower', [min(ydata), 0, 0]);
 p.addParamValue('Startpoints', []);
 

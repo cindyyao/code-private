@@ -1,22 +1,22 @@
 cd /Users/xyao/matlab/code-private/DS_new/
-opt = struct('load_params', 1,'load_neurons', 1, 'load_ei', 1);
+opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 
 
-datadg{1} = load_data('/Volumes/lab/analysis/2015-07-03-0/data000-map/data000-map', opt);
-datadg{1}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s00.mat';
+datadg{1} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data000-map/data000-map', opt);
+datadg{1}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s00.mat';
 datadg{1} = load_stim_matlab(datadg{1}, 'user_defined_trigger_interval', 10);
-datadg{2} = load_data('/Volumes/lab/analysis/2015-07-03-0/data003-map/data003-map', opt);
+datadg{2} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data003-map/data003-map', opt);
 % datadg{2} = load_data('/Analysis/xyao/2015-07-03-0/data003/data003', opt);
-datadg{2}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s03.mat';
+datadg{2}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s03.mat';
 datadg{2} = load_stim_matlab(datadg{2}, 'user_defined_trigger_interval', 10);
-datadg{3} = load_data('/Volumes/lab/analysis/2015-07-03-0/data006-map/data006-map', opt);
-datadg{3}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s06.mat';
+datadg{3} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data006-map/data006-map', opt);
+datadg{3}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s06.mat';
 datadg{3} = load_stim_matlab(datadg{3}, 'user_defined_trigger_interval', 10);
-datadg{4} = load_data('/Volumes/lab/analysis/2015-07-03-0/data009-map/data009-map', opt);
-datadg{4}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s09.mat';
+datadg{4} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data009-map/data009-map', opt);
+datadg{4}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s09.mat';
 datadg{4} = load_stim_matlab(datadg{4}, 'user_defined_trigger_interval', 10);
-datadg{5} = load_data('/Volumes/lab/analysis/2015-07-03-0/data012-map/data012-map', opt);
-datadg{5}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s12.mat';
+datadg{5} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data012-map/data012-map', opt);
+datadg{5}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s12.mat';
 datadg{5} = load_stim_matlab(datadg{5}, 'user_defined_trigger_interval', 10);
 
 %% fig 1C 
@@ -225,7 +225,7 @@ for ct = 1:3
     plot(corner_position(:, 1), corner_position(:, 2))
     hold on
     for i = 1:length(idx_dir_on{ct})
-        [x, y] = circle(center_ds(idx_dir_on{ct}(i), 1), center_ds(idx_dir{ct}(i), 2), radius);
+        [x, y] = circle(center_ds(idx_dir_on{ct}(i), 1), center_ds(idx_dir_on{ct}(i), 2), radius);
         plot(x, y, 'k')
         hold on
     end
@@ -394,3 +394,32 @@ for i = 1:1
     plot(pos(455, 1), pos(455, 2), 'bo')
     axis off
 end
+
+%% NNND
+for dir = 1:4
+    com = center_ds(idx_dir{dir}, :);
+    nnnd_oo{dir} = get_nnnds_xy(com, repmat(radius,1,2));
+end
+for dir = 1:3
+    com = center_ds(idx_dir_on{dir}, :);
+    nnnd_on{dir} = get_nnnds_xy(com, repmat(radius,1,2));
+end
+
+figure
+for dir = 1:4
+    subplot(2,4,dir)
+    hist(nnnd_oo{dir}, [0.05:0.1:2.95])
+    xlim([0 inf])
+end
+for dir = 1:3
+    subplot(2,4,dir+4)
+    hist(nnnd_on{dir}, [0.05:0.1:2.95])
+    xlim([0 inf])
+end
+
+nnnd_all = [cell2mat(nnnd_oo'); cell2mat(nnnd_on')];
+figure
+a = hist(nnnd_all, [0.05:0.1:3.45]);
+bar([0.05:0.1:3.45], a, 1)
+xlabel('nnnd')
+ylabel('cell number')

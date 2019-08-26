@@ -1,5 +1,5 @@
 % wn_map_path = '/Analysis/xyao/2015-07-03-0/data016-map/data016-map';
-wn_path = '/Analysis/xyao/2015-07-03-0/data016/data016';
+wn_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data016/data016';
 cd /Users/xyao/matlab/code-private/DS_new/
 %% load data
 opt = struct('load_params', 1,'load_neurons', 1, 'load_ei', 1);
@@ -112,8 +112,8 @@ dataY(:,3) = center_offset(:,2);
 %% get DS cell id
 % dg_path = '/Analysis/xyao/2015-07-03-0/data012-map/data012-map';
 % dg_stimulus_path = '/Analysis/xyao/2015-07-03-0/stimuli/s12.mat';
-dg_path = '/Analysis/xyao/2015-07-03-0/data012/data012';
-dg_stimulus_path = '/Analysis/xyao/2015-07-03-0/stimuli/s12.mat';
+dg_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data012/data012';
+dg_stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s12.mat';
 datadg = load_data(dg_path, opt);
 datadg.names.stimulus_path = dg_stimulus_path;
 datadg = load_stim_matlab(datadg, 'user_defined_trigger_interval', 10);

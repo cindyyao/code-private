@@ -78,7 +78,9 @@ end
 
 clearvars -EXCEPT rho_dg dsi_dg dirn D T color
 % 2015-07-03-0
+dsi_dg_temp = dsi_dg;
 load('DS150703-1.mat')
+dsi_dg = dsi_dg_temp;
 id = {[261 4576 4923 5087 5239 6017], [2596 3391 4352 7397], [287 1653 6123]};
 [~, idx] = cellfun(@(id) intersect(ds_id, id), id, 'UniformOutput', false);
 
@@ -114,7 +116,9 @@ end
 clearvars -EXCEPT rho_dg dsi_dg dirn D T color
 
 % 2016-01-30-0
+dsi_dg_temp = dsi_dg;
 load('DS160130.mat')
+dsi_dg = dsi_dg_temp;
 id = {[2582 3123 6917 7306], [4502], [392 4863]};
 [~, idx] = cellfun(@(id) intersect(ds_id, id), id, 'UniformOutput', false);
 
@@ -217,6 +221,7 @@ for i = 1:5
     rho_dg_all_ste(i, :) = std(cell2mat(rho_dg{i}'))/sqrt(size(cell2mat(rho_dg{i}'), 1));
 end
 
+%%
 load('DS150603.mat')
 
 D = 5;

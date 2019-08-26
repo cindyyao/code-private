@@ -35,6 +35,8 @@ params_idx = [3 5]; % which parameters to use for classification
 
 [NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg,ds_id,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
+
+load('DS160904.mat')
 %% 
 datarun = load_data('/Volumes/lab/analysis/2016-09-04-0/data004/data004', opt);
 datarun = load_sta(datarun);
@@ -1365,5 +1367,60 @@ for dir = 1:4
     end
 end
 
+
+
+%%
+trial_dur = mean(diff(datamb{1}.stimulus.triggers));
+bin_size = 0.01;
+xx = bin_size/2:bin_size:trial_dur-bin_size/2;
+dscell_type = {'superior', 'anterior', 'inferior', 'posterior'};
+condition = {'control', 'AP5', 'AP5+Hex', 'wash'};
+step_size = 60;
+for drug = 1:4
+    for dir = 1:4
+        CC = 1;
+        for cc = 1:length(idx_dir{dir})
+            if ~isempty(raster_n_sum{drug}{idx_dir{dir}(cc)})
+                for ctr = 7:-1:1
+                    a = raster_n_sum{drug}{idx_dir{dir}(cc)}{ctr};
+                    hist_temp = hist(a, xx);
+                    if drug == 1 && ctr == 7
+                        [max_p, max_i] = max(conv(hist_temp, ones(1,step_size), 'valid'));
+                        Max_i{dir}(CC) = max_i;
+                    else
+                        max_p = conv(hist_temp, ones(1,step_size), 'valid');
+                        max_p = max_p(Max_i{dir}(CC));
+                    end
+%                     response_pn{drug}{dir}(CC, ctr) = max(max_p - mean_n, 0);
+%                     response_pn{drug}{dir}(CC, ctr) = max_p - mean_n;
+%                     response_pn{drug}{dir}(CC, ctr) = abs(max_p - mean_n);
+                    response_pn{drug}{dir}(CC, ctr) = max_p/datamb{drug}.stimulus.repetitions - bgnd_firing{dir}(drug, CC)*bin_size*step_size;
+                end
+                CC = CC + 1;
+            end
+        end
+        response_pn_norm{drug}{dir} = response_pn{drug}{dir}./repmat(max(response_pn{1}{dir}, [], 2), 1, size(response_pn{drug}{dir},2));
+    end
+end
+
+
+ctr_x = [5 10 20 40 80 150 300];
+color = 'brgkc';
+figure
+set(gcf, 'Position', [1 1 900 800])
+
+for dir = 1:4
+    subplot(2,2,dir)
+    for drug = 1:4
+        errorbar(ctr_x, mean(response_pn_norm{drug}{dir}), std(response_pn_norm{drug}{dir})/sqrt(size(response_pn_norm{drug}{dir}, 1)), 'color', color(drug));
+        hold on
+    end
+    legend(condition, 'location', 'northwest')
+    set(gca, 'Xscale', 'log')
+    xlabel('% contrast')
+    ylabel('spike rate')
+    title(dscell_type{dir})
+%     xlim([3 400])
+end
 
 

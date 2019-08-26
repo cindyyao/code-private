@@ -31,7 +31,7 @@ if(totaldur == 1)
     timedur = datarun.stimulus.triggers(1,length(datarun.stimulus.triggers)) + mean(diff(datarun.stimulus.triggers));
 end
 if(totaldur == 0)
-    timestop = 8; %8s stimulus run
+    timestop = 10; %8s stimulus run
     timedur = datarun.stimulus.triggers(1,length(datarun.stimulus.triggers)) + timestop; %8s stimulus run
 end
 

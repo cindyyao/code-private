@@ -1,12 +1,13 @@
 cd /Users/xyao/matlab/code-private/DS_new/
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
+path = '/Volumes/dusom_fieldlab/All_Staff/lab/Experiments/Array/Analysis/2016-03-24-0/';
 
 
-datadg = load_data('/Volumes/lab/analysis/2016-03-24-0/data003-sorted/data003-sorted', opt);
-datadg.names.stimulus_path = '/Volumes/lab/analysis/2016-03-24-0/stimuli/s03.mat';
+datadg = load_data(strcat(path, 'data003-sorted/data003-sorted'), opt);
+datadg.names.stimulus_path = strcat(path, 'stimuli/s03.mat');
 datadg = load_stim_matlab(datadg, 'user_defined_trigger_interval', 10);
 
-dataflash = load_data('/Volumes/lab/analysis/2016-03-24-0/data000-map/data000-map', opt);
+dataflash = load_data(strcat(path, 'data000-map/data000-map'), opt);
 dataflash.DfParams.NDF =   [5,5,5,4,4,4,4,4,3,3,3,2,2,1,0] ; % on filter turret 
 dataflash.DfParams.Ftime = [2,4,8,2,3,4,6,8,2,4,8,8,2,2,2] ; % ms
 dataflash.DfParams.interFlashInt = [3] ; % sec
@@ -148,27 +149,45 @@ for cc = 1:length(ds_id_flash)
         ds_flash_hist_sum = sum(cell2mat(ds_flash_hist_trial{cc}{ts}'));
         for t = 1:trial_n
             template_flash = ds_flash_hist_sum - ds_flash_hist_trial{cc}{ts}{t};
+            template_flash = template_flash(1:bin_n);
             template_flash = template_flash/norm(template_flash);
             template_flash(isnan(template_flash)) = 0;
             template_dark = ds_dark_hist_sum - ds_dark_hist_trial{cc}{t};
+            template_dark = template_dark(1:bin_n);
             template_dark = template_dark/norm(template_dark);
             template_dark(isnan(template_dark)) = 0;
             DV = template_flash - template_dark;
             corr_flash(t) = ds_flash_hist_trial{cc}{ts}{t}(1:bin_n) * DV(1:bin_n)';
             corr_dark(t) = ds_dark_hist_trial{cc}{t}(1:bin_n) * DV(1:bin_n)';
         end
-        Pc(cc, ts) = (sum(corr_flash > 0) + sum(corr_dark <= 0))/(trial_n*2);
+        Pc(cc, ts) = (sum(corr_flash > corr_dark) + sum(corr_flash == corr_dark)/2)/trial_n;
+%         Pc(cc, ts) = (sum(corr_flash > 0) + sum(corr_dark <= 0))/(trial_n*2);
     end
 end
 
 for ct = 1:4
     Pc_dir{ct} = Pc(idx_dir_flash{ct}, :);
 end
-load('DS160304.mat', 'Pc_dir_0304')
+load('DS160304-1.mat', 'Pc_dir_0304')
 
 for i = 1:3
     Pc_dir{i} = [Pc_dir{i}; Pc_dir_0304{i}];
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% trancate sensitivity curve %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+for ct = 1:4
+    for cc = 1:size(Pc_dir{ct}, 1)
+        [m, idx] = max(Pc_dir{ct}(cc, :));
+        Pc_dir{ct}(cc, idx+1:end) = ones(1, size(Pc_dir{ct}, 2)-idx) * m;
+    end
+end
+for cc = 1:size(nds_Pc, 1)
+    [m, idx] = max(nds_Pc(cc, :));
+    nds_Pc(cc, idx+1:end) = ones(1, size(nds_Pc, 2)-idx) * m;
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for ct = 1:4
     Pc_dir_mean(ct, :) = mean(Pc_dir{ct}, 1);
@@ -198,7 +217,7 @@ for ct = 1:4
 end
 xlim([-inf 0.5])
 
-load('DS160304.mat')
+load('DS160304-1.mat')
 
 Pc_temp = mean(nds_Pc);
 Pc_ste_temp = std(nds_Pc)/sqrt(size(nds_Pc, 1));
@@ -278,10 +297,12 @@ legend([h(1), h(2), h(3), h(4), h(5)], 'superior', 'Anterior', 'inferior', 'post
 % end
 
 %%
+window = 1;
 id_all = [5883 7476 4295 4911];
 a = ceil((length(trigger_set_i)+1)/2);
 FigHandle = figure;
 set(FigHandle, 'Position', [0, 0, 1920, 1080]);
+cell_types = {'superior', 'anterior', 'inferior', 'posterior', 'ON sustained'};
 for i = 1:4
     id = id_all(i);
     cc = find(ds_id_flash == id);
@@ -304,14 +325,14 @@ for i = 1:4
             SpikeTime = SpikeTime';
             X = [SpikeTime; SpikeTime];
             Y = [ones(1, length(SpikeTime))*(j-0.9); ones(1, length(SpikeTime))*j];
-            line(X, Y, 'color', 'b');
+            line(X, Y, 'color', color(mod(b-1, 5) + 1));
             axis([0, window, 0, trial_n]);
             set(h, 'xticklabel',[]);
             set(h, 'yticklabel',[]);
             hold on
         end
-        if b == 1
-            title(num2str(ds_id_flash(cc)))
+        if b <= 5
+            title(cell_types{b})
         end
         b = b+5;
         ts = ts+2;
@@ -322,34 +343,34 @@ cc = 10;
 ts = 1;
 b = 5;
 trial_n = length(nds_dark_raster{2});
-    while ts <= length(trigger_set_i)+1
-        h = subplot(a, 5, b);
-        if ts > 1
-            trial_n = length(nds_flash_raster{cc}{ts-1});
-        end
-        for j = 1:trial_n
-            if ts == 1
-                SpikeTime = nds_dark_raster{cc}{j};
-                SpikeTime = SpikeTime(SpikeTime < window);
-            else
-                SpikeTime = nds_flash_raster{cc}{ts-1}{j};
-                SpikeTime = SpikeTime(SpikeTime < window);
-            end
-            SpikeTime = SpikeTime';
-            X = [SpikeTime; SpikeTime];
-            Y = [ones(1, length(SpikeTime))*(j-0.9); ones(1, length(SpikeTime))*j];
-            line(X, Y, 'color', 'b');
-            axis([0, window, 0, trial_n]);
-            set(h, 'xticklabel',[]);
-            set(h, 'yticklabel',[]);
-            hold on
-        end
-        if b == 1
-            title(num2str(ds_id_flash(cc)))
-        end
-        b = b+5;
-        ts = ts+2;
+while ts <= length(trigger_set_i)+1
+    h = subplot(a, 5, b);
+    if ts > 1
+        trial_n = length(nds_flash_raster{cc}{ts-1});
     end
+    for j = 1:trial_n
+        if ts == 1
+            SpikeTime = nds_dark_raster{cc}{j};
+            SpikeTime = SpikeTime(SpikeTime < window);
+        else
+            SpikeTime = nds_flash_raster{cc}{ts-1}{j};
+            SpikeTime = SpikeTime(SpikeTime < window);
+        end
+        SpikeTime = SpikeTime';
+        X = [SpikeTime; SpikeTime];
+        Y = [ones(1, length(SpikeTime))*(j-0.9); ones(1, length(SpikeTime))*j];
+        line(X, Y, 'color', [.5 .5 .5]);
+        axis([0, window, 0, trial_n]);
+        set(h, 'xticklabel',[]);
+        set(h, 'yticklabel',[]);
+        hold on
+    end
+    if b == 5
+        title('ON sustained')
+    end
+    b = b+5;
+    ts = ts+2;
+end
 
 %% fit
 Pc_temp = Pc;
@@ -403,6 +424,16 @@ for cc = 1:length(idx)
     G_all{ct}{cc} = G;
 end
 
+% alpha
+ct = 5;
+for cc = 1:size(nds_Pc, 1)
+
+    ydata = nds_Pc(cc, 1:15)-0.5;
+    xdata = log10(Irel_temp(1:15))+4;
+    [f, G] = fit_mm(xdata, ydata);
+    fit_all{ct}{cc} = f;
+    G_all{ct}{cc} = G;
+end
 %%
 xdata = log10(Irel_temp)+4;
 x = linspace(min(xdata), max(xdata), 1000);
@@ -425,6 +456,17 @@ for ct = 1:3
     xthreshold{ct} = [xthreshold{ct} xthreshold_0304{ct}];
 end
 
+
+ct = 5;
+for cc = 1:size(nds_Pc, 1)
+    f = fit_all{ct}{cc};
+    y = f.ymax*x.^f.a./(x.^f.a + f.sigma^f.a);
+    [~, i] = min(abs(y-threshold));
+%         xthreshold{ct}(cc) = 10^(x(i)-4);
+    xthreshold{ct}(cc) = x(i)-4;
+    rmse{ct}(cc) = G_all{ct}{cc}.rmse;
+end
+
 % exclude outliers
 for ct = 1:4
     notdone = 1;
@@ -439,6 +481,7 @@ for ct = 1:4
         end
     end
 end
+
 
 % xthreshold{4}(1) = [];
 color = 'brgk';

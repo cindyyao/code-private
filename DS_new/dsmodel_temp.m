@@ -113,12 +113,12 @@ alpha1 = [7 7 7 7];
 % tuning curve
 phi = [0 1/2 1 3/2]*pi; % preferred direction
 r_base = [1 1 1 1]; % background firing
-repeat_n = 2000;
+repeat_n = 200;
 
 [Precision_rod, Precision_cone, ERROR_rod, ERROR_cone] = deal(cell(1, 10));
-for repeat = 4:20
+for repeat = 2:10
     clear Precision_ratio
-    if repeat <= 10
+    if repeat <= 5
         ymax = [1 1 1 1]*5; % ymax = 5 for rod light level
     else
         ymax = [1 1 1 1]*30; % ymax = 30 for cone light level
@@ -127,19 +127,21 @@ for repeat = 4:20
         alpha2 = [1 1 1 1]*Alpha2(width); % tuning width 
         for ctr = 1:length(contrast)
             Precision_ratio(width, ctr) = run_poiss_Detection(c50,alpha1,phi,alpha2,r_base,ymax,contrast(ctr),repeat_n);
-            [error(width,ctr), ~] = run_poiss_MLdecoder(c50,alpha1,phi,alpha2,r_base,ymax,contrast(ctr),repeat_n);
+            [error(width,ctr), theta_e{width,ctr}] = run_poiss_MLdecoder(c50,alpha1,phi,alpha2,r_base,ymax,contrast(ctr),repeat_n);
     %         [width ctr]
             disp(['repeat ' num2str(repeat) ' detection task: tuning width ' num2str(width) ' contrast ' num2str(ctr) ' finished.'])
         end
     end
-    if repeat <= 10
+    if repeat <= 5
         Precision_rod{repeat} = Precision_ratio;
         ERROR_rod{repeat} = error;
+        theta_e_rod{repeat} = theta_e;
     else
-        Precision_cone{repeat-10} = Precision_ratio;
-        ERROR_cone{repeat-10} = error;
+        Precision_cone{repeat-5} = Precision_ratio;
+        ERROR_cone{repeat-5} = error;
+        theta_e_cone{repeat} = theta_e;
     end
-    save('dsmodel_xy.mat', 'Precision_rod', 'Precision_cone', 'ERROR_rod', 'ERROR_cone')
+    save('dsmodel_direction.mat', 'Precision_rod', 'Precision_cone', 'ERROR_rod', 'ERROR_cone', 'theta_e_rod', 'theta_e_cone')
 end
 
 Precision_ratio = Precision_ratio_rod;
@@ -235,3 +237,19 @@ xlabel('tuning width / degree')
 ylabel('prediction error / degree')
 % ylim([0 100])
 xlim([0 400])
+
+%%
+for width = 1:20
+    for ctr = 1:6
+        error_max_rod(width, ctr) = max(mean(theta_e_rod{1}{width, ctr}));
+    end
+end
+
+for rep = 1:5
+for width = 1:20
+    for ctr = 1:6
+        error_max_cone(width, ctr, rep) = max(mean(theta_e_cone{rep}{width, ctr}));
+    end
+end
+end
+[~, i] = min(mean(error_max_cone, 3))

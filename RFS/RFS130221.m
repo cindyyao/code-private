@@ -1,8 +1,8 @@
 opt = struct('verbose',1,'load_params', 1,'load_neurons', 1, 'load_ei', 1, 'load_sta', 1);
-datarun0 = load_data('/lab/Experiments/Array/Analysis/2013-02-21-0/data000/data000', opt);
-datarun2 = load_data('/lab/Experiments/Array/Analysis/2013-02-21-0/data002/data002', opt);
-datarun4 = load_data('/lab/Experiments/Array/Analysis/2013-02-21-0/data004/data004', opt);
-datarun5 = load_data('/lab/Experiments/Array/Analysis/2013-02-21-0/data005/data005', opt);
+datarun0 = load_data('/Volumes/lab/Experiments/Array/Analysis/2013-02-21-0/data000/data000', opt);
+datarun2 = load_data('/Volumes/lab/Experiments/Array/Analysis/2013-02-21-0/data002/data002', opt);
+datarun4 = load_data('/Volumes/lab/Experiments/Array/Analysis/2013-02-21-0/data004/data004', opt);
+datarun5 = load_data('/Volumes/lab/Experiments/Array/Analysis/2013-02-21-0/data005/data005', opt);
 [cell_list_map02, ~] = map_ei(datarun0, datarun2);
 [cell_list_map04, ~] = map_ei(datarun0, datarun4);
 [cell_list_map05, ~] = map_ei(datarun0, datarun5);

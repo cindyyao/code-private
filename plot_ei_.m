@@ -35,7 +35,7 @@ p.addParamValue('flipud', 0);%
 p.addParamValue('zoom', 1);%
 p.addParamValue('shift', [0 0]);%
 p.addParamValue('label', false);%
-p.addParamValue('labels', {}); % If given, use these as labels, otherwise just label by number
+p.addParamValue('labels', {}); % If given, use these as labels, otherwise just  by number
 p.addParamValue('disk_points', 125);%
 p.addParamValue('elec_callback', []);%
 p.addParamValue('elec_spacing', infer_electrode_spacing(position));

@@ -12,8 +12,8 @@ tpn = size(raster{1}{ii}, 2);
 tt = DS{1}.theta{1}(1, :);
 for time = 1:tpn
     FigHandle = figure;
-    set(FigHandle, 'Position', [1 1 800 800])
-%     set(FigHandle, 'Position', [1 1 1400 600])
+    set(FigHandle, 'Position', [1 1 400 400])
+%     set(FigHandle, 'Position', [1 1 1400 800])
 %     set(FigHandle, 'Position', [1 1 1620 1080])
 %     set(FigHandle, 'Position', [1 1 1080 1080])
     for j = 1:length(DS)
@@ -29,7 +29,7 @@ for time = 1:tpn
             polar(tt, DS{j}.rho{end-time+1}(cell_idx, :), 'b');
             polar_theta_off(h)
             for i = 2:9
-                subplot(xx, yy, idx(j, i)); plot_raster(squeeze(raster{j}{cell_idx}(1, end-time+1, i-1, :)), 0, 8)
+                subplot(xx, yy, idx(j, i)); plot_raster(squeeze(raster{j}{cell_idx}(1, end-time+1, i-1, :)), 0, 10)
 %                 if i == 4
 %                     title(Title{j})
 %                 end 

@@ -11,12 +11,12 @@ figure
 for onoff = 1:2
     subplot(1, 2, onoff)
     clear mean_temp ste_temp
-    for ll = 2:3
-        mean_temp(ll-1) = mean(dataset{2}.rf_area_clean{ll}{1}{onoff});
-        ste_temp(ll-1) = std(dataset{2}.rf_area_clean{ll}{1}{onoff})/sqrt(length(dataset{2}.rf_area_clean{ll}{1}{onoff}));
-    end
-    errorbar([2 4], mean_temp, ste_temp, 'color', 'b')
-    hold on
+%     for ll = 2:3
+%         mean_temp(ll-1) = mean(dataset{2}.rf_area_clean{ll}{1}{onoff});
+%         ste_temp(ll-1) = std(dataset{2}.rf_area_clean{ll}{1}{onoff})/sqrt(length(dataset{2}.rf_area_clean{ll}{1}{onoff}));
+%     end
+%     errorbar([2 4], mean_temp, ste_temp, 'color', 'b')
+%     hold on
     
     clear mean_temp ste_temp
     for ll = 1:4
@@ -24,6 +24,7 @@ for onoff = 1:2
         ste_temp(ll) = std(dataset{3}.rf_area_clean{ll}{1}{onoff})/sqrt(length(dataset{3}.rf_area_clean{ll}{1}{onoff}));
     end
     errorbar([0 1 2 4], mean_temp, ste_temp, 'color', 'r')
+    hold on
     
     clear mean_temp ste_temp
     for ll = 1:5
@@ -36,6 +37,7 @@ for onoff = 1:2
     ylabel('RF area (mm^2)')
     title(ONOFF{onoff})
     xlim([-1 5])
+    ylim([0 0.4])
 end
 
 %% 'other' cells

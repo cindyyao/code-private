@@ -15,17 +15,17 @@ params_idx = [5 6]; % which parameters to use for classification
 [NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg,ds_id,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
 
-datarun = load_data('/Volumes/lab/analysis/2016-06-17-0/data002-004-map/data002-004-map', opt);
+datarun = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-06-17-0/data002-004-map/data002-004-map', opt);
 time_points = [1600 3100];
 datamb(1:3) = split_datarun(datarun, time_points);
-datamb{1}.names.stimulus_path = '/Volumes/lab/analysis/2016-06-17-0/stimuli/s02.mat';
+datamb{1}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-06-17-0/stimuli/s02.mat';
 datamb{1} = load_stim_matlab(datamb{1});
-datamb{2}.names.stimulus_path = '/Volumes/lab/analysis/2016-06-17-0/stimuli/s03.mat';
+datamb{2}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-06-17-0/stimuli/s03.mat';
 datamb{2} = load_stim_matlab(datamb{2});
-datamb{3}.names.stimulus_path = '/Volumes/lab/analysis/2016-06-17-0/stimuli/s04.mat';
+datamb{3}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-06-17-0/stimuli/s04.mat';
 datamb{3} = load_stim_matlab(datamb{3});
 
-datawn = load_data('/Volumes/lab/analysis/2016-06-17-0/data000-map/data000-map', opt);
+datawn = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-06-17-0/data000-map/data000-map', opt);
 datawn = load_sta(datawn);
 datawn = get_rfs(datawn, 'all');
 %% dg
@@ -72,7 +72,7 @@ for i = 1:n
     MAG_all_norm_mb{i} = normalize_MAG(MB{i});
     rep = datamb{i}.stimulus.repetitions;
 end
-
+close all
 %% classification based on speed tunning
 L = 1;
 mag_pca = MAG_all_norm_dg{L};
@@ -158,8 +158,8 @@ for i = 1:dirn
 end
 
 %% plot cell summary
-for cc = 1:length(ds_id)
-    plot_mb_raster_ctr(MB, raster_mb, trial_dur, cc, ds_id(cc), 'NDF0', 3, 7, 1)
+for cc = 33:33%length(ds_id)
+    plot_mb_raster_ctr(MB, raster_mb, trial_dur, cc, ds_id(cc), 'NDF0', 3, 7, 0)
 end
 
 %% Direction tuning (moving bar)
@@ -1157,4 +1157,161 @@ for drug = 1:1
         ylabel('normalized response')
         title(dscell_type{dir})
     end
+end
+
+
+%% response latency change with HEX
+for drug = 1:3
+    for cc = 1:length(raster_mb{drug})
+        if ~isempty(raster_mb{drug}{cc})
+            for dir = 1:8
+                for ctr = 1:7
+                    raster_mb_all{drug}{cc}{dir, ctr} = sort(cell2mat(squeeze(raster_mb{drug}{cc}(1,1,dir,ctr, :))));
+                end
+            end
+        end
+    end
+end
+
+
+clear raster_mb_all_hist
+bin_size = 0.01;
+trial_duration = 3.1;
+xx = 0:bin_size:trial_duration;
+sigma = 0.025;
+gx = -0.1:bin_size:0.1;
+gy = exp(-gx.^2/(2*sigma^2));
+gfilter = gy/sum(gy);
+
+for drug = 1:3
+    for cc = 1:length(raster_mb{drug})
+        if ~isempty(raster_mb{drug}{cc})
+            for dir = 1:8
+                for ctr = 1:7
+                    temp = histc(raster_mb_all{drug}{cc}{dir, ctr}, xx);
+                    temp = reshape(temp, length(temp), 1);
+                    hist_temp = conv(temp, gfilter', 'same');
+                    raster_mb_all_hist{drug}{cc}{dir, ctr} = hist_temp;
+                    peak_rate = max(hist_temp);
+                    peak_80_i = find(hist_temp >= peak_rate*0.8, 1);
+                    peak_20_i = find(hist_temp >= peak_rate*0.2, 1);
+                    if peak_20_i < peak_80_i
+%                         p = polyfit(xx(peak_20_i:peak_80_i),hist_temp(peak_20_i:peak_80_i)', 1); 
+                        p = polyfit(xx([peak_20_i peak_80_i]), hist_temp([peak_20_i peak_80_i])', 1);
+                        lag = -p(2)/p(1);
+                        lag_all{drug}{cc}(dir, ctr) = lag;
+                    else
+                        lag_all{drug}{cc}(dir, ctr) = nan;
+                    end
+                end
+            end
+        end
+    end
+end
+
+for ct = 1:4
+    for cc = 1:length(id_dir{ct})
+        if ~isempty(raster_mb{1}{idx_dir{ct}(cc)})
+            pindex{ct}(cc) = get_pindex(cellfun(@length, raster_mb_all{1}{idx_dir{ct}(cc)}(:, 1))');
+        end
+        for drug = 1:3
+            if ~isempty(raster_mb{drug}{idx_dir{ct}(cc)})
+                lag_all{drug}{idx_dir{ct}(cc)} = circshift(lag_all{drug}{idx_dir{ct}(cc)}, [4-pindex{ct}(cc), 0]);
+                raster_mb_all{drug}{idx_dir{ct}(cc)} = circshift(raster_mb_all{drug}{idx_dir{ct}(cc)}, [4-pindex{ct}(cc), 0]);
+            end
+        end
+    end
+end
+%%
+ct = 1;
+cc = 1;
+dir = pindex{ct}(cc);
+ctr = 1;
+figure
+for i = 1:2
+    subplot(2,2,(i-1)*2+1)
+    hist_temp = raster_mb_all_hist{i}{idx_dir{ct}(cc)}{dir, ctr}/bin_size/10;
+    plot(xx, hist_temp);
+    hold on
+    peak_rate = max(hist_temp);
+    peak_80_i = find(hist_temp >= peak_rate*0.8, 1);
+    peak_20_i = find(hist_temp >= peak_rate*0.2, 1);
+    if peak_20_i < peak_80_i
+%         p = polyfit(xx(peak_20_i:peak_80_i),hist_temp(peak_20_i:peak_80_i)', 1); 
+        p = polyfit(xx([peak_20_i peak_80_i]), hist_temp([peak_20_i peak_80_i])', 1);
+        plot(xx, polyval(p, xx))
+    end
+%     ylim([0 peak_rate*1.1])
+    ylim([0 45])
+    xlabel('time (s)')
+    ylabel('firing rate (Hz)')
+    if i == 1
+        title('ctr PD')
+    else
+        title('HEX PD')
+    end
+end
+
+dir = mod(dir+3,8)+1;
+for i = 1:2
+    subplot(2,2,2*i)
+    hist_temp = raster_mb_all_hist{i}{idx_dir{ct}(cc)}{dir, ctr}/bin_size/10;
+    plot(xx, hist_temp);
+    hold on
+    peak_rate = max(hist_temp);
+    peak_80_i = find(hist_temp >= peak_rate*0.8, 1);
+    peak_20_i = find(hist_temp >= peak_rate*0.2, 1);
+    if peak_20_i < peak_80_i
+%         p = polyfit(xx(peak_20_i:peak_80_i),hist_temp(peak_20_i:peak_80_i)', 1); 
+        p = polyfit(xx([peak_20_i peak_80_i]), hist_temp([peak_20_i peak_80_i])', 1);
+        plot(xx, polyval(p, xx))
+    end
+%     ylim([0 peak_rate*1.1])
+    ylim([0 45])
+    xlabel('time (s)')
+    ylabel('firing rate (Hz)')
+    if i == 1
+        title('ctr ND')
+    else
+        title('HEX ND')
+    end
+end
+
+%% 
+theta = 0:45:315;
+ctr = 1;
+
+figure
+for ct = 1:4
+    for cc = 1:length(id_dir{ct})
+        if ~isempty(raster_mb{drug}{idx_dir{ct}(cc)})
+            lag_diff{ct}{ctr}(:, cc) = lag_all{2}{idx_dir{ct}(cc)}(:, ctr) - lag_all{1}{idx_dir{ct}(cc)}(:, ctr);
+        else
+            lag_diff{ct}{ctr}(:, cc) = nan([8,1]);
+        end
+    end
+    lag_diff{ct}{ctr}(abs(lag_diff{ct}{ctr}) > 3) = nan;
+    for dir = 1:length(theta)
+        lag_diff_clean{ct}{ctr}(dir, :) = exclude_outliers_nan(lag_diff{ct}{ctr}(dir, :), 3);
+        lag_diff_mean{ct}(ctr, dir) = nanmean(lag_diff_clean{ct}{ctr}(dir, :));
+        lag_diff_ste{ct}(ctr, dir) = nanstd(lag_diff_clean{ct}{ctr}(dir, :))/sqrt(sum(~isnan(lag_diff{ct}{ctr}(dir, :))));
+    end
+    subplot(2,2,ct)
+    plot(theta+20, lag_diff_clean{ct}{1})
+    xlabel('direction')
+    ylabel('second')
+    ylim([-1 1])
+    xlim([0 360])
+
+end
+
+cell_types = {'superior', 'anterior', 'inferior', 'posterior'};
+figure
+for ct = 1:4
+    subplot(2,2,ct)
+    errorbar(theta+20, lag_diff_mean{ct}(ctr, :), lag_diff_ste{ct}(ctr, :))
+    xlim([0 360])
+    xlabel('direction')
+    ylabel('second')
+    title(cell_types{ct})
 end

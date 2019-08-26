@@ -1,7 +1,7 @@
-dg_path = '/Volumes/lab/analysis/2015-07-03-0/data012-map/data012-map';
-dg_stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s12.mat';
-wn_path = '/Volumes/lab/analysis/2015-07-03-0/data016-map/data016-map';
-wn_nonmap_path = '/Volumes/lab/analysis/2015-07-03-0/data016/data016';
+dg_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data012-map/data012-map';
+dg_stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s12.mat';
+wn_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data016-map/data016-map';
+wn_nonmap_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data016/data016';
 cd /Users/xyao/matlab/code-private/DS_new/
 
 %% load data
@@ -83,7 +83,7 @@ robust_idx = get_cell_indices(datawn_nonmap, robust_id);
 
 frame = datawn_nonmap.ei.nrPoints + datawn_nonmap.ei.nlPoints + 1;
 elec = size(datawn_nonmap.ei.position, 1);
-distance = 1;
+distance = 3;
 center_ei = zeros(length(robust_id),2);
 stixel_size_ = datawn_nonmap.stimulus.stixel_width;
 for i = 1:length(robust_id)
@@ -129,24 +129,34 @@ center_ei_display(outlier_i,:) = [];
 center_sta(outlier_i,:) = [];
 
 % replot offset map
-figure
-quiver(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,1),center_offset(:,2),0)
+corner_i = [4 126 195 264 386 455 4];
+corner_position = datadg.ei.position(corner_i, :);
+corner_position_display = tformfwd(Tform, corner_position);
+figure(100)
+quiver(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,1),center_offset(:,2),0, 'color', 'b')
+hold on
 id_text = cellfun(@num2str, num2cell(robust_id), 'Uni', false);
-text(center_ei_display(:,1), center_ei_display(:,2), id_text);
-
+% text(center_ei_display(:,1), center_ei_display(:,2), id_text);
+plot(corner_position_display(:, 1), corner_position_display(:, 2), 'k')
 % 
-figure
-scatter3(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,2))
+% figure
+% scatter3(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,2))
 
-% fit plane
-dataX(:,1:2) = center_ei_display;
-dataX(:,3) = center_offset(:,1);
-dataY(:,1:2) = center_ei_display;
-dataY(:,3) = center_offset(:,2);
+% % fit plane
+% dataX(:,1:2) = center_ei_display;
+% dataX(:,3) = center_offset(:,1);
+% dataY(:,1:2) = center_ei_display;
+% dataY(:,3) = center_offset(:,2);
+% 
+% [normal_x, meanX, pcaExplainedX, sseX] = fit_plane(dataX);
+% zlabel('x offset')
+% [normal_y, meanY, pcaExplainedY, sseY] = fit_plane(dataY);
+% zlabel('y offset')
 
-[normal_x, meanX, pcaExplainedX, sseX] = fit_plane(dataX);
-[normal_y, meanY, pcaExplainedY, sseY] = fit_plane(dataY);
-
+offset_x_fit = meanX*normal_x*ones(length(robust_id),1) - center_ei_display*normal_x(1:2);
+offset_y_fit = meanX*normal_y*ones(length(robust_id),1) - center_ei_display*normal_y(1:2);
+figure(100)
+quiver(center_ei_display(:,1),center_ei_display(:,2),offset_x_fit,offset_y_fit,0, 'color', 'r')
 
 %% get DS cell id
 % [NumSpikesCell, StimComb] = get_spikescellstim(datadg,datadg.cell_ids,0);
@@ -155,6 +165,13 @@ dataY(:,3) = center_offset(:,2);
 % params_idx = input('indices of parameters for classification: (eg. [1 2])\n'); 
 % [ds_id, nonds_id] = classify_ds(datadg, ds_struct, params_idx);
 load('DS150703-1.mat')
+ds_id = intersect(datawn.cell_ids, intersect(datadg.cell_ids, ds_id));
+for i = 1:4
+    [id_dir{i}, idx_dir{i}] = intersect(ds_id, id_dir{i});
+end
+for i = 1:3
+    [id_dir_on{i}, idx_dir_on{i}] = intersect(ds_id, id_dir_on{i});
+end
 ds_idx = get_cell_indices(datadg, ds_id);
 
 %% get DS cell location
@@ -189,11 +206,43 @@ offset_ds = [offset_x_ds offset_y_ds];
 center_sta_ds_est = (center_ei_ds + offset_ds)/stixel_size_;
 
 %%
+% replot offset map
+corner_i = [4 126 195 264 386 455 4];
+corner_position = datadg.ei.position(corner_i, :);
+corner_position_display = tformfwd(Tform, corner_position);
+figure(101)
+quiver(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,1),center_offset(:,2),0, 'color', 'b')
+hold on
+id_text = cellfun(@num2str, num2cell(robust_id), 'Uni', false);
+plot(corner_position_display(:, 1), corner_position_display(:, 2), 'k')
+
+offset_x_ds = meanX*normal_x*ones(length(ds_id),1) - center_ei_ds*normal_x(1:2);
+offset_y_ds = meanX*normal_y*ones(length(ds_id),1) - center_ei_ds*normal_y(1:2);
+figure(101)
+quiver(center_ei_ds(:,1),center_ei_ds(:,2),offset_x_ds,offset_y_ds,0, 'color', 'r')
+%%
+% replot offset map
+corner_i = [4 126 195 264 386 455 4];
+corner_position = datadg.ei.position(corner_i, :);
+corner_position_display = tformfwd(Tform, corner_position);
+figure(101)
+quiver(center_ei_display(:,1),center_ei_display(:,2),center_offset(:,1),center_offset(:,2),0, 'color', 'b')
+hold on
+id_text = cellfun(@num2str, num2cell(robust_id), 'Uni', false);
+plot(corner_position_display(:, 1), corner_position_display(:, 2), 'k')
+
+elec_position_display = tformfwd(Tform, datadg.ei.position);
+offset_x_ds = meanX*normal_x*ones(size(datadg.ei.position, 1),1) - elec_position_display*normal_x(1:2);
+offset_y_ds = meanX*normal_y*ones(size(datadg.ei.position, 1),1) - elec_position_display*normal_y(1:2);
+figure(101)
+quiver(elec_position_display(:,1),elec_position_display(:,2),offset_x_ds,offset_y_ds,0, 'color', 'r')
+
+%%
 % on-off dsgc
 
 oo_ds = {'posterior', 'inferior', 'anterior', 'superior'};
 x = [3 3 4 4]; y = [5 5 5 5];
-for i = 4:4
+for i = 1:4
     figure
     for cc = 1:length(id_dir{i})
         subplot(x(i), y(i), cc)
@@ -269,7 +318,7 @@ for ct = 1:3
     plot(corner_position(:, 1), corner_position(:, 2))
     hold on
     for i = 1:length(idx_dir_on{ct})
-        [x, y] = circle(center_ds(idx_dir_on{ct}(i), 1), center_ds(idx_dir{ct}(i), 2), radius);
+        [x, y] = circle(center_ds(idx_dir_on{ct}(i), 1), center_ds(idx_dir_on{ct}(i), 2), radius);
         plot(x, y, 'k')
         hold on
     end

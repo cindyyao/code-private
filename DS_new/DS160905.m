@@ -2,23 +2,23 @@ cd /Users/xyao/matlab/code-private/DS_new/
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 
 
-datadg = load_data('/Volumes/lab/analysis/2016-09-05-0/data004-sorted/data004-sorted', opt);
-datadg.names.stimulus_path = '/Volumes/lab/analysis/2016-09-05-0/stimuli/s04.txt';
+datadg = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-09-05-0/data004-sorted/data004-sorted', opt);
+datadg.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-09-05-0/stimuli/s04.txt';
 datadg = load_stim(datadg, 'user_defined_trigger_interval', 10);
 
-datarun = load_data('/Volumes/lab/analysis/2016-09-05-0/data000-003-map/data000-003-map', opt);
+datarun = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-09-05-0/data000-003-map/data000-003-map', opt);
 time_points = [1900 3800 5700];
 datamb(1:4) = split_datarun(datarun, time_points);
-datamb{1}.names.stimulus_path = '/Volumes/lab/analysis/2016-09-05-0/stimuli/s00.txt';
+datamb{1}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-09-05-0/stimuli/s00.txt';
 datamb{1} = load_stim(datamb{1}, 'user_defined_trigger_set', [1:2:1120]);
 datamb{1}.stimulus.triggers = datamb{1}.stimulus.triggers';
-datamb{2}.names.stimulus_path = '/Volumes/lab/analysis/2016-09-05-0/stimuli/s01.txt';
+datamb{2}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-09-05-0/stimuli/s01.txt';
 datamb{2} = load_stim(datamb{2}, 'user_defined_trigger_set', [1:2:1120]);
 datamb{2}.stimulus.triggers = datamb{2}.stimulus.triggers';
-datamb{3}.names.stimulus_path = '/Volumes/lab/analysis/2016-09-05-0/stimuli/s02.txt';
+datamb{3}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-09-05-0/stimuli/s02.txt';
 datamb{3} = load_stim(datamb{3}, 'user_defined_trigger_set', [1:2:1120]);
 datamb{3}.stimulus.triggers = datamb{3}.stimulus.triggers';
-datamb{4}.names.stimulus_path = '/Volumes/lab/analysis/2016-09-05-0/stimuli/s03.txt';
+datamb{4}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-09-05-0/stimuli/s03.txt';
 datamb{4} = load_stim(datamb{4}, 'user_defined_trigger_set', [1:2:1120]);
 datamb{4}.stimulus.triggers = datamb{4}.stimulus.triggers';
 
@@ -726,4 +726,158 @@ for dir = 1:4
     title(dscell_type{dir})
 end
 
+%% response latency change with HEX
+for drug = 1:4
+    for cc = 1:length(raster_mb{drug})
+        if ~isempty(raster_mb{drug}{cc})
+            for dir = 1:8
+                for ctr = 1:7
+                    raster_mb_all{drug}{cc}{dir, ctr} = sort(cell2mat(squeeze(raster_mb{drug}{cc}(1,1,dir,ctr, :))));
+                end
+            end
+        end
+    end
+end
 
+
+clear raster_mb_all_hist
+bin_size = 0.01;
+trial_duration = 3.1;
+xx = 0:bin_size:trial_duration;
+sigma = 0.025;
+gx = -0.1:bin_size:0.1;
+gy = exp(-gx.^2/(2*sigma^2));
+gfilter = gy/sum(gy);
+
+for drug = 1:4
+    for cc = 1:length(raster_mb{drug})
+        if ~isempty(raster_mb{drug}{cc})
+            for dir = 1:8
+                for ctr = 1:7
+                    temp = histc(raster_mb_all{drug}{cc}{dir, ctr}, xx);
+                    temp = reshape(temp, length(temp), 1);
+                    hist_temp = conv(temp, gfilter', 'same');
+                    raster_mb_all_hist{drug}{cc}{dir, ctr} = hist_temp;
+                    peak_rate = max(hist_temp);
+                    peak_80_i = find(hist_temp >= peak_rate*0.8, 1);
+                    peak_20_i = find(hist_temp >= peak_rate*0.2, 1);
+                    if peak_20_i < peak_80_i
+%                         p = polyfit(xx(peak_20_i:peak_80_i),hist_temp(peak_20_i:peak_80_i)', 1); 
+                        p = polyfit(xx([peak_20_i peak_80_i]), hist_temp([peak_20_i peak_80_i])', 1);
+                        lag = -p(2)/p(1);
+                        lag_all{drug}{cc}(dir, ctr) = lag;
+                    else
+                        lag_all{drug}{cc}(dir, ctr) = nan;
+                    end
+                end
+            end
+        end
+    end
+end
+
+for ct = 1:4
+    for cc = 1:length(id_dir{ct})
+        if ~isempty(raster_mb{1}{idx_dir{ct}(cc)})
+            pindex{ct}(cc) = get_pindex(cellfun(@length, raster_mb_all{1}{idx_dir{ct}(cc)}(:, 1))');
+        end
+        for drug = 1:4
+            if ~isempty(raster_mb{drug}{idx_dir{ct}(cc)})
+                lag_all{drug}{idx_dir{ct}(cc)} = circshift(lag_all{drug}{idx_dir{ct}(cc)}, [4-pindex{ct}(cc), 0]);
+                raster_mb_all{drug}{idx_dir{ct}(cc)} = circshift(raster_mb_all{drug}{idx_dir{ct}(cc)}, [4-pindex{ct}(cc), 0]);
+            end
+        end
+    end
+end
+%%
+ct = 2;
+cc = 15;
+dir = pindex{ct}(cc);
+ctr = 7;
+figure
+for i = 1:2
+    subplot(2,2,(i-1)*2+1)
+    hist_temp = raster_mb_all_hist{i}{idx_dir{ct}(cc)}{dir, ctr}/bin_size/10;
+    plot(xx, hist_temp);
+    hold on
+    peak_rate = max(hist_temp);
+    peak_80_i = find(hist_temp >= peak_rate*0.8, 1);
+    peak_20_i = find(hist_temp >= peak_rate*0.2, 1);
+    if peak_20_i < peak_80_i
+%         p = polyfit(xx(peak_20_i:peak_80_i),hist_temp(peak_20_i:peak_80_i)', 1); 
+        p = polyfit(xx([peak_20_i peak_80_i]), hist_temp([peak_20_i peak_80_i])', 1);
+        plot(xx, polyval(p, xx))
+    end
+    ylim([0 peak_rate*1.1])
+%     ylim([0 45])
+    xlabel('time (s)')
+    ylabel('firing rate (Hz)')
+    if i == 1
+        title('ctr PD')
+    else
+        title('HEX PD')
+    end
+end
+
+dir = mod(dir+3,8)+1;
+for i = 1:2
+    subplot(2,2,2*i)
+    hist_temp = raster_mb_all_hist{i}{idx_dir{ct}(cc)}{dir, ctr}/bin_size/10;
+    plot(xx, hist_temp);
+    hold on
+    peak_rate = max(hist_temp);
+    peak_80_i = find(hist_temp >= peak_rate*0.8, 1);
+    peak_20_i = find(hist_temp >= peak_rate*0.2, 1);
+    if peak_20_i < peak_80_i
+%         p = polyfit(xx(peak_20_i:peak_80_i),hist_temp(peak_20_i:peak_80_i)', 1); 
+        p = polyfit(xx([peak_20_i peak_80_i]), hist_temp([peak_20_i peak_80_i])', 1);
+        plot(xx, polyval(p, xx))
+    end
+    ylim([0 peak_rate*1.1])
+%     ylim([0 45])
+    xlabel('time (s)')
+    ylabel('firing rate (Hz)')
+    if i == 1
+        title('ctr ND')
+    else
+        title('HEX ND')
+    end
+end
+
+%% 
+theta = 0:45:315;
+ctr = 1;
+
+figure
+for ct = 1:4
+    for cc = 1:length(id_dir{ct})
+        if ~isempty(raster_mb{drug}{idx_dir{ct}(cc)})
+            lag_diff{ct}{ctr}(:, cc) = lag_all{2}{idx_dir{ct}(cc)}(:, ctr) - lag_all{1}{idx_dir{ct}(cc)}(:, ctr);
+        else
+            lag_diff{ct}{ctr}(:, cc) = nan([8,1]);
+        end
+    end
+    lag_diff{ct}{ctr}(abs(lag_diff{ct}{ctr}) > 3) = nan;
+    for dir = 1:length(theta)
+        lag_diff_clean{ct}{ctr}(dir, :) = exclude_outliers_nan(lag_diff{ct}{ctr}(dir, :), 3);
+        lag_diff_mean{ct}(ctr, dir) = nanmean(lag_diff_clean{ct}{ctr}(dir, :));
+        lag_diff_ste{ct}(ctr, dir) = nanstd(lag_diff_clean{ct}{ctr}(dir, :))/sqrt(sum(~isnan(lag_diff{ct}{ctr}(dir, :))));
+    end
+    subplot(2,2,ct)
+    plot(theta+20, lag_diff_clean{ct}{1})
+    xlabel('direction')
+    ylabel('second')
+    ylim([-1 1])
+    xlim([0 360])
+
+end
+
+cell_types = {'superior', 'anterior', 'inferior', 'posterior'};
+figure
+for ct = 1:4
+    subplot(2,2,ct)
+    errorbar(theta+20, lag_diff_mean{ct}(ctr, :), lag_diff_ste{ct}(ctr, :))
+    xlim([0 360])
+    xlabel('direction')
+    ylabel('second')
+    title(cell_types{ct})
+end

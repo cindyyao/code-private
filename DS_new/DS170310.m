@@ -263,10 +263,10 @@ for drug = 1:3
         response_pmax_norm{drug}{dir} = response_pmax{drug}{dir}./repmat(max(response_pmax{1}{dir}, [], 2), 1, size(response_pmax{drug}{dir},2));
 %         response_pmax_norm{drug}{dir} = response_pmax{drug}{dir}./repmat(max(response_pmax{drug}{dir}, [], 2), 1, size(response_pmax{drug}{dir},2));
     end
-    response_pmax_all{drug} = cell2mat(response_pmax{drug}(1)');
-    response_pmax_norm_all{drug} = cell2mat(response_pmax_norm{drug}(1)');
-%     response_pmax_all{drug} = cell2mat(response_pmax{drug}');
-%     response_pmax_norm_all{drug} = cell2mat(response_pmax_norm{drug}');
+%     response_pmax_all{drug} = cell2mat(response_pmax{drug}(1)');
+%     response_pmax_norm_all{drug} = cell2mat(response_pmax_norm{drug}(1)');
+    response_pmax_all{drug} = cell2mat(response_pmax{drug}');
+    response_pmax_norm_all{drug} = cell2mat(response_pmax_norm{drug}');
 
 end
 

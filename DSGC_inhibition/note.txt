@@ -1,0 +1,4 @@
+Add a summary plot for fig 5c.
+
+fig2
+A-D: cut RF from 17x17 to 13x13 in intaglio. Tricky to cut in the code so running the code will print out original 17x17 RF.

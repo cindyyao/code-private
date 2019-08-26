@@ -74,9 +74,9 @@ end
 
 %% 
 
-screen_size = [8 8];
+screen_size = [7 7];
 % name = 'ON-transient-438-ndf1';
-for i = 2:2
+for i = 1:1
     name =num2str(i);
     set(figure(i), 'paperpositionmode', 'auto');
     % set(figure(1), 'PaperPosition', [-0.5 -0.25 22 10]);

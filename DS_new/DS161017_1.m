@@ -302,7 +302,7 @@ end
 % CRF 
 figure(4)
 subplot(3, 2, 3)
-dir = 3;
+dir = 4;
 for drug = 1:2
     crf_mean(drug, :) = mean(response_max_all{drug}(:, dir, :));
     crf_ste(drug, :) = std(response_max_all{drug}(:, dir, :))./sqrt(size(response_max_all{drug}, 1));
@@ -337,9 +337,11 @@ legend([h(1), h(2)], 'control', 'AP5')
 ylim([0 2])
 
 a = (response_max_all{1} - response_max_all{2})./response_max_all{1};
+b = (response_max_all{1} < 0) | (response_max_all{2} < 0);
 for i = 1:8
     for j = 1:7
         temp = a(:, i, j);
+        temp(b(:, i, j)) = [];
         temp(isinf(temp)) = [];
         temp(isnan(temp)) = [];
         temp(temp < 0) = 0;
@@ -356,7 +358,8 @@ end
 % b = squeeze(nanmean(a));
 % c = squeeze(nanstd(a)./sqrt(size(a, 1)));
 figure(3)
-s = surf(xx, yy, blockMean');
+temp = blockMean(1:7, :);
+s = surf(xx(:, 1:7), yy(:, 1:7), temp');
 s.EdgeColor = 'none';
 set(gca, 'yscale', 'log')
 % xlabel('direction (degree)')
@@ -366,23 +369,27 @@ xlim([min(min(xx)) max(max(xx))])
 ylim([min(yy(:)) max(yy(:))])
 caxis([0 1])
 axis off
-colorbar
+% colorbar
 
 
-
-i = 4;
 figure
-errorbar(theta, blockMean(:, i), blockSte(:, i))
-ylim([0 1])
+i = 4;
+subplot(1, 2, 1)
+errorbar(theta(1:7), blockMean(1:7, i), blockSte(1:7, i))
+ylim([0 1.1])
 % xlim([-0.1 1.1])
-legend('150%', '20%')
+% legend('150%', '20%')
+xlabel('direction')
+ylabel('% blocked')
 
 j = 4;
-figure
+subplot(1, 2, 2)
 errorbar(ctr_x, blockMean(j, :), blockSte(j, :))
-ylim([0 1])
+ylim([0 1.1])
 xlim([4 400])
 set(gca, 'xscale', 'log')
+xlabel('contrast')
+ylabel('% blocked')
 
 
 
@@ -411,7 +418,7 @@ legend([h(1), h(2)], 'control', 'AP5')
 % CRF 
 figure(4)
 subplot(3, 2, 3)
-dir = 4;
+dir = 3;
 for drug = 1:2
     crf_mean(drug, :) = mean(response_max_all{drug}(:, dir, :));
     crf_ste(drug, :) = std(response_max_all{drug}(:, dir, :))./sqrt(size(response_max_all{drug}, 1));
@@ -573,8 +580,8 @@ i = 6;j = 3;
 
 
 i = 3;j = 7;
-[spikeCountAvg{2}(1, :), blockAvg{2}(1, :), disError{2}(1, :)] = curve_from_binning(ratio_spike_ctr{i}(1, :), ratio_spike_ctr{i}(2, :), 'average_y', 'mean','average_x', 'mean', 'bin_edges', 0:0.5:10);
-[spikeCountAvg{2}(2, :), blockAvg{2}(2, :), disError{2}(2, :)] = curve_from_binning(ratio_spike_dir{j}(1, :), ratio_spike_dir{j}(2, :), 'average_y', 'mean','average_x', 'mean', 'bin_edges', 0:0.5:10);
+[spikeCountAvg{2}(1, :), blockAvg{2}(1, :), disError{2}(1, :)] = curve_from_binning(ratio_spike_ctr{i}(1, :), ratio_spike_ctr{i}(2, :), 'average_y', 'mean','average_x', 'mean', 'bin_edges', 0:1:10);
+[spikeCountAvg{2}(2, :), blockAvg{2}(2, :), disError{2}(2, :)] = curve_from_binning(ratio_spike_dir{j}(1, :), ratio_spike_dir{j}(2, :), 'average_y', 'mean','average_x', 'mean', 'bin_edges', 0:1:10);
 
 figure(5)
 subplot(1, 2, 1)
@@ -654,3 +661,72 @@ for ctr = 1:7
     plot(xfit, yfit, color(8-ctr));
 end
     
+%%
+for drug = 1:2
+    thresh_all = cell2mat(response_pmax{drug}') > 1;
+    for i = 1:size(thresh_all, 1)
+        thresh(i, drug) = ctr_x(find(thresh_all(i, :) == 1, 1));
+    end
+end
+%%
+block = response_max_all{1} - response_max_all{2};
+block(block < 0) = 0;
+temp = squeeze(block(:, 4, :));
+y_dir(1, :) = temp(:);
+temp = squeeze(response_max_all{2}(:, 4, :));
+y_dir(2, :) = temp(:);
+[remainSpike, blockSpike, spikeError] = curve_from_binning(y_dir(2, :), y_dir(1, :), 'average_y', 'mean','average_x', 'mean', 'bin_edges', 0:2:30);
+
+figure
+errorbar(remainSpike, blockSpike, spikeError)
+ylabel('# of spikes blocked')
+xlabel('# of spikes remained')
+hold on
+
+%
+temp = squeeze(block(:, :, 6));
+y_ctr(1, :) = temp(:);
+temp = squeeze(response_max_all{2}(:, :, 6));
+y_ctr(2, :) = temp(:);
+[remainSpike, blockSpike, spikeError] = curve_from_binning(y_ctr(2, :), y_ctr(1, :), 'average_y', 'mean','average_x', 'mean', 'bin_edges', 0:2:30);
+
+errorbar(remainSpike, blockSpike, spikeError)
+legend('PD', '150%')
+
+%
+block = response_max_all{1} - response_max_all{2};
+block(block < 0) = 0;
+temp = squeeze(block(:, 1, :));
+y_dir(1, :) = temp(:);
+temp = squeeze(response_max_all{2}(:, 1, :));
+y_dir(2, :) = temp(:);
+[remainSpike, blockSpike, spikeError] = curve_from_binning(y_dir(2, :), y_dir(1, :), 'average_y', 'mean','average_x', 'mean', 'bin_edges', 0:10);
+
+figure
+errorbar(remainSpike, blockSpike, spikeError)
+ylabel('# of spikes blocked')
+xlabel('# of spikes remained')
+hold on
+
+%
+temp = squeeze(block(:, :, 3));
+y_ctr(1, :) = temp(:);
+temp = squeeze(response_max_all{2}(:, :, 3));
+y_ctr(2, :) = temp(:);
+[remainSpike, blockSpike, spikeError] = curve_from_binning(y_ctr(2, :), y_ctr(1, :), 'average_y', 'mean','average_x', 'mean', 'bin_edges', 0:10);
+
+errorbar(remainSpike, blockSpike, spikeError)
+legend('ND', '20%')
+
+%%
+contrast = {'5%', '10%', '20%', '40%', '80%', '150%', '300%'};
+figure
+for ctr = 1:4
+    subplot(1, 4, ctr)
+    for cc = 1:size(response_max_all{1}, 1)
+        plot([1 2], [response_max_all{1}(cc, 4, ctr) response_max_all{2}(cc, 4, ctr)], 'o-')
+        hold on
+    end
+    title(num2str(contrast{ctr}))
+    xlim([0.5 2.5])
+end

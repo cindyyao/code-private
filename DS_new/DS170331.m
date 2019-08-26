@@ -98,6 +98,28 @@ for i = 1:n
     rep = datamb{i}.stimulus.repetitions;
 end
 
+%%
+d = 1;
+t = 1;
+h = figure;
+dirn = 4;
+set(h, 'Position', [1 1 1080 500])
+compass(DG{d}.U{t}, DG{d}.V{t});
+color = 'brgkc';
+
+for i = 1:dirn
+    hold on
+    [x, y] = ginput;
+    plot(x, y, color(i));
+
+    IN = inpolygon(DG{d}.U{t}, DG{d}.V{t}, x, y);
+    [~, I] = find(IN == 1);
+    idx_dir{i} = I;
+    id_dir{i} = ds_id(idx_dir{i});
+end
+
+
+
 %% mb wash
 bin_size = 0.025; %sec
 [raster_mb_wash, MB_wash, raster_mb_all_wash] = deal(cell(n, 1));
@@ -121,13 +143,21 @@ for dir = 1:2
     CC = 1;
     for cc = 1:length(id_dir{dir})
         if ~mb_idx(idx_dir{dir}(cc))
-            wash_mean{dir}(1,CC) = mean(spikes_wash{1}{idx_dir{dir}(cc)}(1:20, 2));
-            wash_mean{dir}(2,CC) = mean(spikes_wash{1}{idx_dir{dir}(cc)}(end-19:end, 2));
-            wash_mean{dir}(3,CC) = mean(spikes_wash{2}{idx_dir{dir}(cc)}(1:20, 2));
-            wash_mean{dir}(4,CC) = mean(spikes_wash{2}{idx_dir{dir}(cc)}(end-19:end, 2));
+            wash_response{dir}{1}(:, CC) = spikes_wash{1}{idx_dir{dir}(cc)}(1:20, 2);
+            wash_mean{dir}(1,CC) = mean(wash_response{dir}{1}(:, CC));
+            wash_response{dir}{2}(:, CC) = spikes_wash{1}{idx_dir{dir}(cc)}(end-19:end, 2);
+            wash_mean{dir}(2,CC) = mean(wash_response{dir}{2}(:, CC));
+            wash_response{dir}{3}(:, CC) = spikes_wash{2}{idx_dir{dir}(cc)}(1:20, 2);
+            wash_mean{dir}(3,CC) = mean(wash_response{dir}{3}(:, CC));
+            wash_response{dir}{4}(:, CC) = spikes_wash{2}{idx_dir{dir}(cc)}(end-19:end, 2);
+            wash_mean{dir}(4,CC) = mean(wash_response{dir}{4}(:, CC));
             CC = CC + 1;
         end
     end
+    for i = 1:4
+        wash_response{dir}{i} = reshape(wash_response{dir}{i}, prod(size(wash_response{dir}{i})), 1);
+    end
+    wash_response{dir} = cell2mat(wash_response{dir});
 end
 
 ds_cell_type = {'superior', 'anterior'};
@@ -135,9 +165,33 @@ figure
 for dir = 1:2
     subplot(1,2,dir)
     plot(wash_mean{dir})
+    hold on
+    for i = 1:size(wash_response{dir}, 1)
+        scatter([1 2 3 4], wash_response{dir}(i, :))
+    end
+    
     title(ds_cell_type{dir})
     ylabel('spike#')
 end
+
+conditions = {'wash in start', 'wash in end', 'wash out start', 'wash out end'};
+for dir = 1:2
+    figure
+    for i = 1:4
+        subplot(4, 1, i)
+        if dir == 1
+            hist(wash_response{dir}(:, i), 0.5:1:30)
+        else
+            hist(wash_response{dir}(:, i), 0.5:1:10)
+        end
+        if i == 1
+            title(ds_cell_type{dir})
+        end
+        ylabel(conditions{i})
+        xlabel('# of spikes')
+    end
+end
+    
 %%
 filter1 = ones(3, 1)/3;
 filter2 = ones(3, 1)/3;

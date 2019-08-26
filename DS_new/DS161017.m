@@ -3,10 +3,10 @@ cd /Users/xyao/matlab/code-private/DS_new/
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 
 % load drifting grating data
-datadg = load_data('/Volumes/lab/analysis/2016-10-17-0/data002/data002', opt);
-datadg.names.stimulus_path = '/Volumes/lab/analysis/2016-10-17-0/stimuli/s02.txt';
+datadg = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-10-17-0/data002/data002', opt);
+datadg.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-10-17-0/stimuli/s02.txt';
 datadg = load_stim(datadg, 'user_defined_trigger_interval', 10);
-
+datadg = load_ei(datadg, id_dir{1});
 % identify DS cells
 [NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg,datadg.cell_ids,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
@@ -15,28 +15,29 @@ params_idx = [3 4]; % which parameters to use for classification
 [ds_id, nonds_id] = classify_ds(datadg, ds_struct, params_idx);
 
 % load moving bar data
-datarun = load_data('/Volumes/lab/analysis/2016-10-17-0/data003-007-map/data003-007-map', opt);
+datarun = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-10-17-0/data003-007-map/data003-007-map', opt);
 time_points = [1900 3800 5700];
 datamb(1:4) = split_datarun(datarun, time_points);
 
-datamb{1}.names.stimulus_path = '/Volumes/lab/analysis/2016-10-17-0/stimuli/s03.txt';
+datamb{1}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-10-17-0/stimuli/s03.txt';
 datamb{1} = load_stim(datamb{1}, 'user_defined_trigger_set', [1:2:1120]);
 datamb{1}.stimulus.triggers = datamb{1}.stimulus.triggers';
-datamb{2}.names.stimulus_path = '/Volumes/lab/analysis/2016-10-17-0/stimuli/s05.txt';
+datamb{2}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-10-17-0/stimuli/s05.txt';
 datamb{2} = load_stim(datamb{2}, 'user_defined_trigger_set', [1:2:1120]);
 datamb{2}.stimulus.triggers = datamb{2}.stimulus.triggers';
-datamb{3}.names.stimulus_path = '/Volumes/lab/analysis/2016-10-17-0/stimuli/s06.txt';
+datamb{3}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-10-17-0/stimuli/s06.txt';
 datamb{3} = load_stim(datamb{3}, 'user_defined_trigger_set', [1:2:1120]);
 datamb{3}.stimulus.triggers = datamb{3}.stimulus.triggers';
-datamb{4}.names.stimulus_path = '/Volumes/lab/analysis/2016-10-17-0/stimuli/s07.txt';
+datamb{4}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-10-17-0/stimuli/s07.txt';
 datamb{4} = load_stim(datamb{4}, 'user_defined_trigger_set', [1:2:1120]);
 datamb{4}.stimulus.triggers = datamb{4}.stimulus.triggers';
 
-% load white noise data
-datawn = load_data('/Volumes/lab/analysis/2016-10-17-0/data001-map/data001-map', opt);
-datawn = load_sta(datawn);
-
 load('DS161017.mat')
+% load white noise data
+datawn = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-10-17-0/data001-map/data001-map', opt);
+% datawn = load_sta(datawn);
+datawn = load_ei(datawn, cell2mat(id_dir));
+
 % id_ot = get_cell_ids(datawn, 'ON type 1');
 % id_ot_mb = intersect(id_ot, datamb{1}.cell_ids);
 [NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg,ds_id,0,1);
@@ -418,13 +419,13 @@ for drug = 1:4
                 for ctr = 7:-1:1
                     a = raster_p_sum{drug}{idx_dir{dir}(cc)}{ctr};
                     hist_temp = hist(a, xx);
-                    if drug == 1 && ctr == 7
+%                     if drug == 1 && ctr == 7
                         [max_p, max_i] = max(conv(hist_temp, ones(1,step_size), 'valid'));
                         Max_i{dir}(CC) = max_i;
-                    else
-                        max_p = conv(hist_temp, ones(1,step_size), 'valid');
-                        max_p = max_p(Max_i{dir}(CC));
-                    end
+%                     else
+%                         max_p = conv(hist_temp, ones(1,step_size), 'valid');
+%                         max_p = max_p(Max_i{dir}(CC));
+%                     end
                     response_pmax{drug}{dir}(CC, ctr) = max_p/datamb{drug}.stimulus.repetitions - bgnd_firing{dir}(drug, CC)*bin_size*step_size;
                 end
                 CC = CC + 1;
@@ -476,10 +477,10 @@ for dir = 1:4
             hold on
             plot(x, y)
 
-            sigma{drug}{dir}(cc) = f.sigma;
-            ymax{drug}{dir}(cc) = f.ymax;
-            aa{drug}{dir}(cc) = f.a;
-            bb{drug}{dir}(cc) = f.b;
+            sigma{dir}(drug, cc) = f.sigma;
+            ymax{dir}(drug, cc) = f.ymax;
+            aa{dir}(drug, cc) = f.a;
+            bb{dir}(drug, cc) = f.b;
         end
     end
 end
@@ -606,10 +607,10 @@ for drug = 1:4
         hold on
         plot(x, y)
 
-        sigma{5}(drug, cc) = f.sigma;
-        ymax{5}(drug, cc) = f.ymax;
-        aa{5}(drug, cc) = f.a;
-        bb{5}(drug, cc) = f.b;
+        sigma{6}(drug, cc) = f.sigma;
+        ymax{6}(drug, cc) = f.ymax;
+        aa{6}(drug, cc) = f.a;
+        bb{6}(drug, cc) = f.b;
     end
 end
 
@@ -735,6 +736,11 @@ ylim([-0.1 1.2])
 %% mb
 n = 4;
 bin_size = 0.025; %sec
+
+% id_ot_mb = get_cell_ids(datawn, 'OFF type2');
+% id_ot_mb = id_ot_mb([1 3 4 5 10 12 15]);
+clear MB_ot raster_mb_ot raster_p_sum_ot
+% 
 [raster_mb_ot, MB_ot, trial_dur, raster_p_sum_ot, p_idx_ot] = deal(cell(n, 1));
 for i = 1:n    
     [NumSpikesCell, MaxRate, StimComb] = get_spikescellstim_mb(datamb{i},id_ot_mb,duration(i),bin_size);
@@ -749,7 +755,7 @@ for i = 1:n
     [raster_p_sum_ot{i}, p_idx_ot{i}, raster_p_sum_all{i}] = get_pdirection_raster(raster_mb_ot{i}, MB_ot{1}.angle{ctr_p});
     rep = datamb{i}.stimulus.repetitions;
 end
-% close all
+close all
 %% plot cell summary
 drug = 1;
 for cc = 1:length(id_ot_mb)
@@ -759,7 +765,7 @@ for cc = 1:length(id_ot_mb)
 end
 
 %% ON transient cell CRF
-clear Max_i
+clear Max_i response_pmax_ot_norm response_pmax_ot
 trial_dur = mean(diff(datamb{1}.stimulus.triggers));
 bin_size = 0.01;
 xx = bin_size/2:bin_size:trial_dur-bin_size/2;
@@ -802,14 +808,15 @@ xlim([3 400])
 
 % fit ds
 clear fit_all G_all
+i = 5;
 for drug = 1:4
     figure
     set(gcf, 'Position', [1 1 900 800])
     for cc = 1:size(response_pmax_ot_norm{drug}, 1)
 
-        ydata = response_pmax_ot_norm{drug}(cc, :);
+        ydata = response_pmax_ot{drug}(cc, :);
         xdata = log10(ctr_x);
-        [f, G] = fit_nr(xdata, ydata, 'upper', [2, 100, log10(300), 0]);
+        [f, G] = fit_nr(xdata, ydata, 'upper', [100, 100, log10(300), 0]);
         fit_all{drug}{cc} = f;
         G_all{drug}{cc} = G;
 
@@ -821,10 +828,10 @@ for drug = 1:4
         hold on
         plot(x, y)
 
-        sigma{6}(drug, cc) = f.sigma;
-        ymax{6}(drug, cc) = f.ymax;
-        aa{6}(drug, cc) = f.a;
-        bb{6}(drug, cc) = f.b;
+        sigma{i}(drug, cc) = f.sigma;
+        ymax{i}(drug, cc) = f.ymax;
+        aa{i}(drug, cc) = f.a;
+        bb{i}(drug, cc) = f.b;
     end
 end
  
@@ -834,6 +841,9 @@ for dir = 1:6
     sigma_ste{dir} = std(10.^sigma{dir}')/sqrt(size(sigma{dir}, 2));
 end
 
+sigma_oods = 10.^cell2mat(sigma(1:4))';
+sigma_oods_mean = mean(sigma_oods);
+sigma_oods_ste = std(sigma_oods)/sqrt(size(sigma_oods, 2));
 %% sigma
 cell_type = {'superior', 'anterior', 'inferior', 'posterior', 'ON DS', 'ON transient'};
 FigHandle = figure;
@@ -1866,7 +1876,7 @@ bin_size = 0.01;
 xx = bin_size/2:bin_size:trial_dur-bin_size/2;
 dscell_type = {'superior', 'anterior', 'inferior', 'posterior'};
 condition = {'control', 'AP5', 'wash'};
-step_size = 60;
+step_size = 50;
 for drug = 1:4
     for dir = 1:4
         for theta = 1:8
@@ -1891,6 +1901,10 @@ for drug = 1:4
             response_max_norm{drug}{dir}(:, theta, :) = squeeze(response_max{drug}{dir}(:, theta, :))./repmat(squeeze(max(response_max{1}{dir}(:, theta, :), [], 1)), 1, size(response_max{drug}{dir},1))';
         end
     end
+end
+
+for drug = 1:2
+    response_max_all{drug} = cell2mat(response_max{drug}');
 end
 
 
@@ -2171,3 +2185,652 @@ caxis([0 1])
 axis off
 colorbar
 
+%% 
+figure
+subplot(1, 2, 1)
+hist(Sigma1, 10)
+subplot(1, 2, 2)
+hist(Sigma2, 10)
+
+%% fit ds
+clear Max_i
+trial_dur = mean(diff(datamb{1}.stimulus.triggers));
+bin_size = 0.01;
+xx = bin_size/2:bin_size:trial_dur-bin_size/2;
+dscell_type = {'superior', 'anterior', 'inferior', 'posterior'};
+condition = {'control', 'AP5', 'wash'};
+step_size = 60;
+for drug = 1:4
+    for dir = 1:4
+        for theta = 1:8
+            CC = 1;
+            for cc = 1:length(idx_dir{dir})
+                if ~isempty(raster_mb_all{drug}{idx_dir{dir}(cc)})
+                    for repeat = 1:10
+                        for ctr = 7:-1:1
+                            a = raster_mb{drug}{idx_dir{dir}(cc)}{1,1,theta,ctr,repeat};
+                            hist_temp = hist(a, xx);
+%                             if drug == 1 && ctr == 7
+                                [max_fr, max_i] = max(conv(hist_temp, ones(1,step_size), 'valid'));
+%                                 Max_i{dir}(theta, CC) = max_i;
+%                             else
+%                                 max_fr = conv(hist_temp, ones(1,step_size), 'valid');
+%                                 max_fr = max_fr(Max_i{dir}(theta, CC));
+%                             end
+                            response_max{drug}{dir}(CC, theta, ctr, repeat) = max_fr - bgnd_firing{dir}(drug, CC)*bin_size*step_size;
+                        end
+                    end
+                    CC = CC + 1;
+                end
+            end
+%             response_max{drug}{dir} = mean(response_max{drug}{dir}, 4);
+%             response_max_norm{drug}{dir}(:, theta, :) = squeeze(response_max{drug}{dir}(:, theta, :))./repmat(squeeze(max(response_max{1}{dir}(:, theta, :), [], 1)), 1, size(response_max{drug}{dir},1))';
+        end
+        response_max{drug}{dir} = mean(response_max{drug}{dir}, 4);
+
+    end
+end
+
+
+for dir = 1:4
+    for cc = 1:length(idx_dir_mb{dir})
+        pindex{dir}(cc) = get_pindex(response_max{1}{dir}(cc, :, 7));
+        for drug = 1:4
+            for ctr = 1:7
+                response_max{drug}{dir}(cc, :, ctr) = circshift(response_max{drug}{dir}(cc, :, ctr), [0, 4-pindex{dir}(cc)]);
+                response_max_norm{drug}{dir}(cc, :, ctr) = response_max{drug}{dir}(cc, :, ctr)/max(response_max{drug}{dir}(cc, :, ctr));
+            end
+        end
+    end
+end
+
+for drug = 1:2
+    response_max_all{drug} = cell2mat(response_max{drug}');
+end
+
+dir = 4;
+CC = 1;
+x = log10([80 150 300]);
+for cc = 1:size(response_max_all{drug}, 1)
+%     figure
+%     set(gcf, 'Position', [1 1 900 800])
+    
+    for drug = 1:2
+
+        ydata = squeeze(response_max_all{drug}(cc, dir, :));
+        xdata = log10(ctr_x);
+        [f, G] = fit_nr(xdata, ydata', 'upper', [100, 100, log10(300), 0]);
+        fit_all{drug}{cc} = f;
+        G_all{drug}{cc} = G;
+
+        y(drug, :) = f.ymax*x.^f.a./(x.^f.a + f.sigma^f.a)+f.b;
+    end
+    if y(1, 2) > (y(1, 3) + y(1, 1))/2 && y(2, 2) > (y(2, 3) + y(2, 1))/2 && fit_all{1}{cc}.sigma < log10(150) && fit_all{2}{cc}.sigma < log10(150)
+        for drug = 1:2    
+            sigma(drug, CC) = fit_all{drug}{cc}.sigma;
+            ymax(drug, CC) = fit_all{drug}{cc}.ymax;
+            aa(drug, CC) = fit_all{drug}{cc}.a;
+            bb(drug, CC) = fit_all{drug}{cc}.b;
+        end
+        CC = CC + 1;
+    end
+
+%         subplot(5,6,cc)
+%         plot(xdata, ydata)
+%         hold on
+%         plot(x, y)
+
+
+end
+p = signrank(10.^sigma(1, :), 10.^sigma(2, :))
+[~, p] = ttest(sigma(1, :), sigma(2, :))
+%
+figure
+subplot(1, 2, 1)
+hist(sigma(1, :))
+xlabel('c50')
+ylabel('cell #')
+title('control')
+subplot(1, 2, 2)
+hist(sigma(2, :))
+title('AP5')
+xlabel('c50')
+ylabel('cell #')
+
+%%
+color_temp = 'br';
+figure
+i = 1;
+for cc = 1:size(response_max_all{drug}, 1)
+    if i > 21
+        i = 1;
+        figure
+    end
+    subplot(3, 7, i)
+    for drug = 1:2
+        ydata = squeeze(response_max_all{drug}(cc, dir, :));
+        xdata = log10(ctr_x);
+        [f, G] = fit_nr(xdata, ydata', 'upper', [100, 100, log10(300), 0]);
+        x = linspace(min(xdata), max(xdata), 100);
+        y = f.ymax*x.^f.a./(x.^f.a + f.sigma^f.a)+f.b;
+        sigma(drug, cc) = f.sigma;
+        plot(xdata, ydata, color_temp(drug))
+        hold on
+        plot(x, y, color_temp(drug))
+    end
+    xlabel('log(contrast)')
+    ylabel('response')
+    title(['s1: ' num2str(sigma(1, cc)) '  s2: ' num2str(sigma(2, cc))])
+    i = i + 1;
+end
+
+%% 
+figure
+scatter(10.^sigma(1, :), 10.^sigma(2, :))
+hold on
+plot([0 150], [0 150])
+xlim([0 150])
+ylim([0 150])
+xlabel('C50 (%) at control')
+ylabel('C50 (%) at AP5')
+
+%% white noise cross correlation
+duration = 2700;
+bin_size = 0.00025;
+max_lag = 40;
+ct = 1;
+N = 10000;
+xx = -max_lag*bin_size:bin_size:max_lag*bin_size;
+corr_cells_test = [];
+dis = [];
+area_ccf = [];
+area_ccf_min = [];
+pos = datawn.ei.position;
+mode = 'neg';
+
+for c1 = 1:length(id_dir{ct})-1
+%     FigHandle = figure;
+%     set(FigHandle, 'Position', [1 1 1980 1080])
+    for c2 = c1+1:length(id_dir{ct})
+        if c1 ~= c2
+            id1 = id_dir{ct}(c1);
+            id2 = id_dir{ct}(c2);
+            idx1 = get_cell_indices(datawn, id1);
+            idx2 = get_cell_indices(datawn, id2);
+            spikes1 = datawn.spikes{idx1};
+            spikes1_TF= ceil(spikes1/bin_size);
+            spikes1 = zeros(duration/bin_size, 1);
+            spikes1(spikes1_TF) = 1;
+            
+            spikes2 = datawn.spikes{idx2};
+            spikes2_TF= ceil(spikes2/bin_size);
+            spikes2 = zeros(duration/bin_size, 1);
+            spikes2(spikes2_TF) = 1;
+            
+            A = xcorr(spikes1, spikes2, max_lag, 'coeff');
+%             [maxv(c1, c2), maxi(c1, c2)] = max(A);
+%             a = round(0.001/bin_size)+max_lag;
+%             b = conv(A, ones(1, 11), 'valid');
+%             ratio(c1, c2) = (sum(A(a:a+10)) + sum(A(max_lag*2-a-10:max_lag*2-a)) - min(A)*22)/(min(b)*2 - min(A)*22);
+% %             ratio(c1, c2) = (sum(A(a:a+10)) + sum(A(max_lag*2-a-10:max_lag*2-a)) - min(A)*20)/ ...
+% %                 (sum(A(1:11)) + sum(A(end-10:end)) - min(A)*20);
+% %             A = xcov(spikes1, spikes2, max_lag, 'coeff');
+% %             A_count = xcorr(spikes1, spikes2, max_lag);
+%             [h, filteredA] = find_smallest_h(A);
+% %             h_hat = zeros(1, N);
+% %             for i = 1:N
+% %                 samples = sample_dist(filteredA, round(sum(A_count)));
+% %                 A2 = hist(samples, max_lag*2+1);
+% %                 h_hat(i) = find_smallest_h(A2');
+% %             end
+% %             
+%             [bootstat,bootsam] = bootstrp(N,@find_smallest_h_hist,rude(round(filteredA*sum(A)/sum(filteredA)), 1:max_lag*2+1), max_lag);
+% %             p(c1, c2) = sum(h_hat > h)/N;
+%             p(c1, c2) = sum(bootstat > h)/N;
+%             subplot(5, 5, c2)
+%             if p(c1, c2) < 0.05 && ratio(c1, c2) > 2 && maxi(c1, c2) > 0.75*max_lag && maxi(c1, c2) < 1.25*max_lag+1
+% %                 bar(xx, A, 'r')
+%                corr_cells_test = [corr_cells_test; id1 id2];
+%             else
+% %                 bar(xx, A, 'b')
+%             end
+% % %             subplot(5, 5, c2)
+% % %             bar(xx, A, 'b')
+% %             title([num2str(id1) '  ' num2str(id2) '  ' num2str(p(c1, c2))])
+% %             xlim([-0.01 0.01])
+% % 
+% % %             pause
+%             ei1 = datawn.ei.eis{idx1};
+%             com1 = ei_com_xy(ei1, pos, 30*3, mode);
+%             ei2 = datawn.ei.eis{idx2};
+%             com2 = ei_com_xy(ei2, pos, 30*3, mode);
+%             dis = [dis pdist([com1;com2])];
+            dp_temp = sum(A(21:61) - min(A(21:61)));
+%             area_ccf = [area_ccf dp_temp];
+            area_ccf_min = [area_ccf_min dp_temp];
+        end
+    end
+    c1
+%     print_close(1, [24 12], num2str(id1));
+end
+
+[area_ccf_sort, i] = sort(area_ccf);
+dis_sort = dis(i);
+
+
+figure
+plot(dis_sort(4:end), area_ccf_sort(4:end), 'o')
+xlabel('distance (um)')
+ylabel('correlated activity (area under CCF)')
+
+figure
+plot(dis, area_ccf_min, 'o')
+xlabel('distance (um)')
+ylabel('correlated activity (area under CCF)')
+%% neighboring pairs
+pos = datawn.ei.position;
+mode = 'neg';
+neighbors = [];
+ct = 1;
+for cc1 = 1:length(id_dir{ct})
+    for cc2 = cc1+1:length(id_dir{ct})
+        id1 = id_dir{ct}(cc1);
+        idx1 = get_cell_indices(datawn, id1);
+        ei1 = datawn.ei.eis{idx1};
+        com1 = ei_com_xy(ei1, pos, 30*3, mode);
+        id2 = id_dir{ct}(cc2);
+        idx2 = get_cell_indices(datawn, id2);
+        ei2 = datawn.ei.eis{idx2};
+        com2 = ei_com_xy(ei2, pos, 30*3, mode);
+        if pdist([com1;com2]) < 150
+            neighbors = [neighbors; id1 id2];
+        end
+    end
+end
+
+cn = 0;
+ct = 1;
+celltype = {'superior', 'anterior', 'inferior', 'posterior'};
+coms = [];
+for cc = 1:length(id_dir{ct})
+    id = id_dir{ct}(cc);
+    idx = get_cell_indices(datawn, id);
+    ei = datawn.ei.eis{idx};
+    com = ei_com_xy(ei, pos, 30*3, mode);
+    coms = [coms; com];
+end
+
+corner_i = [4 126 195 264 386 455 4];
+corner_position = datawn.ei.position(corner_i, :);
+figure
+for cc = 1:length(id_dir{ct})
+    plot(coms(cc, 1), coms(cc, 2),'ko')
+    hold on
+    text(coms(cc, 1)+5, coms(cc, 2)+5, num2str(id_dir{ct}(cc)), 'FontSize', 10)
+    
+end
+
+% for cp = 1:size(corr_cells)
+%     idx1 = find(id_dir{1} == corr_cells(cp, 1));
+%     idx2 = find(id_dir{1} == corr_cells(cp, 2));
+%     plot([coms(idx1, 1), coms(idx2, 1)], [coms(idx1, 2), coms(idx2, 2)], 'k');
+% end
+% 
+plot(corner_position(:, 1), corner_position(:, 2), 'color', [.5 .5 .5])
+axis off
+title(celltype{ct})
+
+% ct = 1;
+cp_i = [];
+for c1 = 1:length(id_dir{ct})-1
+    for c2 = c1+1:length(id_dir{ct})
+        if norm([coms(c1, :) - coms(c2, :)]) < 150
+            cn = cn + 1;
+            cp_i = [cp_i; c1 c2];
+        end
+    end
+end
+%%
+duration = 2700;
+bin_size = 0.00025;
+max_lag = 40;
+ct = 2;
+N = 10000;
+
+xx = -max_lag*bin_size:bin_size:max_lag*bin_size;
+FigHandle = figure;
+set(FigHandle, 'Position', [1 1 2000 2000])
+A_all = [];
+for cp = 1:size(neighbors, 1)
+%     id1 = corr_cells(cp, 1);
+%     id2 = corr_cells(cp, 2);
+    
+    id1 = neighbors(cp, 1);
+    id2 = neighbors(cp, 2);
+
+    idx1 = get_cell_indices(datawn, id1);
+    idx2 = get_cell_indices(datawn, id2);
+    spikes1 = datawn.spikes{idx1};
+    spikes1_TF= ceil(spikes1/bin_size);
+    spikes1 = zeros(duration/bin_size, 1);
+    spikes1(spikes1_TF) = 1;
+
+    spikes2 = datawn.spikes{idx2};
+    spikes2_TF= ceil(spikes2/bin_size);
+    spikes2 = zeros(duration/bin_size, 1);
+    spikes2(spikes2_TF) = 1;
+
+    A = xcorr(spikes1, spikes2, max_lag, 'coeff');
+    A_all = [A_all A];
+% %     A = xcorr(spikes1, spikes2, max_lag);
+%     [h, filteredA] = find_smallest_h(A);
+%     [bootstat,bootsam] = bootstrp(N,@find_smallest_h_hist,rude(round(filteredA), 1:max_lag*2+1), max_lag);
+%     p = sum(bootstat > h)/N;
+    subplot(7, 6, cp)
+%     if p(c1, c2) < 0.05 && ratio(c1, c2) > 2 && maxi(c1, c2) > 0.75*max_lag && maxi(c1, c2) < 1.25*max_lag+1 && maxv(c1, c2) > 10
+       bar(xx, A, 'k')
+%     else
+%        bar(xx, A, 'r')
+%     end
+    title([num2str(id1) '  ' num2str(id2) '  ' num2str(p(find(id_dir{1} == id1), find(id_dir{1} == id2)))])
+    xlim([-0.01 0.01])
+
+end
+
+%%
+A_superior_mean = mean(A_all_superior, 2);
+A_superior_ste = std(A_all_superior, [], 2)/sqrt(size(A_all_superior, 2));
+figure
+patch([xx fliplr(xx)], [A_superior_mean + A_superior_ste; flipud(A_superior_mean - A_superior_ste)]', [1 1 1]*0.8)
+hold on
+plot(xx, A_superior_mean, 'k')
+% axis off
+
+A_anterior_mean = mean(A_all_anterior, 2);
+A_anterior_ste = std(A_all_anterior, [], 2)/sqrt(size(A_all_anterior, 2));
+figure
+patch([xx fliplr(xx)], [A_anterior_mean + A_anterior_ste; flipud(A_anterior_mean - A_anterior_ste)]', [1 1 1]*0.8)
+hold on
+plot(xx, A_anterior_mean, 'k')
+% axis off
+ylim([0 0.015])
+
+%% test for multimodality 
+% find smallest h that makes filtered distribution unimodal
+[h, filteredA] = find_smallest_h(A);
+[bootstat,bootsam] = bootstrp(500,@find_smallest_h_hist,rude(round(filteredA), 1:max_lag*2+1), max_lag);
+figure
+bar(A)
+hold on
+plot(filteredA)
+
+%% null direction responses
+
+trial_dur = mean(diff(datamb{1}.stimulus.triggers));
+bin_size = 0.01;
+xx = bin_size/2:bin_size:trial_dur-bin_size/2;
+dscell_type = {'superior', 'anterior', 'inferior', 'posterior'};
+condition = {'control', 'AP5', 'AP5+HEX', 'wash'};
+step_size = 30;
+for drug = 1:4
+    for dir = 1:4
+        CC = 1;
+        for cc = 1:length(idx_dir{dir})
+            if ~isempty(raster_n_sum{drug}{idx_dir{dir}(cc)})
+                for ctr = 5:-1:1
+                    a = raster_n_sum{drug}{idx_dir{dir}(cc)}{ctr};
+                    hist_temp = hist(a, xx);
+                    if drug == 1 && ctr == 5
+                        [max_p, max_i] = max(conv(hist_temp, ones(1,step_size), 'valid'));
+                        Max_i{dir}(CC) = max_i;
+                    else
+                        max_p = conv(hist_temp, ones(1,step_size), 'valid');
+                        max_p = max_p(Max_i{dir}(CC));
+                    end
+%                     response_pn{drug}{dir}(CC, ctr) = max(max_p - mean_n, 0);
+%                     response_pn{drug}{dir}(CC, ctr) = max_p - mean_n;
+%                     response_pn{drug}{dir}(CC, ctr) = abs(max_p - mean_n);
+                    response_pn{drug}{dir}(CC, ctr) = max_p/datamb{drug}.stimulus.repetitions;
+%                     response_pn{drug}{dir}(CC, ctr) = max_p/datamb{drug}.stimulus.repetitions;
+                end
+                CC = CC + 1;
+            end
+        end
+        response_pn_norm{drug}{dir} = response_pn{drug}{dir}./repmat(max(response_pn{drug}{dir}, [], 2), 1, size(response_pn{drug}{dir},2));
+    end
+end
+
+ctr_x = [5 10 20 40 80 150 300];
+color = 'brgkc';
+
+figure
+for drug = 1:4
+    subplot(2,2,drug)
+%     response_s{drug} = max(exciseRows_empty(response_pn{drug}{1}), 0);
+    response_s{drug} = exciseRows_empty(response_pn{drug}{1});
+    mean_temp = nanmean(response_s{drug});
+    ste_temp = nanstd(response_s{drug})/sqrt(size(response_s{drug}, 1));
+    errorbar(ctr_x(1:5), mean_temp(1:5), ste_temp(1:5), 'color', color(1));
+    hold on
+%     response_others{drug} = max(exciseRows_empty(cell2mat(response_pn{drug}(2:4)')), 0);
+    response_others{drug} = exciseRows_empty(cell2mat(response_pn{drug}(2:4)'));
+    mean_temp = nanmean(response_others{drug});
+    ste_temp = nanstd(response_others{drug})/sqrt(size(response_others{drug}, 1));
+    errorbar(ctr_x(1:5), mean_temp(1:5), ste_temp(1:5), 'color', color(2));
+    legend('superior', 'others', 'location', 'northwest')
+    set(gca, 'Xscale', 'log')
+    xlabel('% contrast')
+    ylabel('spike rate')
+    title(condition{drug})
+    xlim([3 400])
+end
+
+%% white noise cross correlation
+duration = 2700;
+bin_size = 0.00025;
+max_lag = 40;
+ct = 1;
+N = 10000;
+
+xx = -max_lag*bin_size:bin_size:max_lag*bin_size;
+FigHandle = figure;
+set(FigHandle, 'Position', [1 1 2000 2000])
+
+for cp = 1:size(cp_i, 1)
+    id1 = id_dir{1}(cp_i(cp, 1));
+    id2 = id_dir{1}(cp_i(cp, 2));
+    idx1 = get_cell_indices(datawn, id1);
+    idx2 = get_cell_indices(datawn, id2);
+    spikes1 = datawn.spikes{idx1};
+    spikes1_TF= ceil(spikes1/bin_size);
+    spikes1 = zeros(duration/bin_size, 1);
+    spikes1(spikes1_TF) = 1;
+
+    spikes2 = datawn.spikes{idx2};
+    spikes2_TF= ceil(spikes2/bin_size);
+    spikes2 = zeros(duration/bin_size, 1);
+    spikes2(spikes2_TF) = 1;
+
+    A = xcorr(spikes1, spikes2, max_lag, 'coeff');
+%     subplot(5, 6, cp)
+%     bar(xx, A)
+    cp_index(cp) = (max(A(8:10)) + max(A(12:14)) - 2*min(A)) / (2*(A(11) - min(A)));
+
+end
+
+load('DS161017.mat', 'cp_index_wt')
+figure
+subplot(2, 1, 1)
+hist(cp_index_wt)
+subplot(2, 1, 2)
+hist(cp_index_ko)
+
+%%
+duration = 2700/2;
+bin_size = 0.00025/2;
+max_lag = 40*2;
+ct = 1;
+N = 10000; 
+xx = -max_lag*bin_size:bin_size:max_lag*bin_size;
+FigHandle = figure;
+set(FigHandle, 'Position', [1 1 2000 2000])
+A_all = [];
+for cp = 1:size(corr_cells, 1)
+    id1 = corr_cells(cp, 1);
+    id2 = corr_cells(cp, 2);
+    
+%     id1 = neighbors(cp, 1);
+%     id2 = neighbors(cp, 2);
+
+    idx1 = get_cell_indices(datawn, id1);
+    idx2 = get_cell_indices(datawn, id2);
+    spikes1 = datawn.spikes{idx1};
+    spikes1(spikes1 > duration) = [];
+    spikes1_TF= ceil(spikes1/bin_size);
+    spikes1 = zeros(duration/bin_size, 1);
+    spikes1(spikes1_TF) = 1;
+
+    spikes2 = datawn.spikes{idx2};
+    spikes2(spikes2 > duration) = [];
+    spikes2_TF= ceil(spikes2/bin_size);
+    spikes2 = zeros(duration/bin_size, 1);
+    spikes2(spikes2_TF) = 1;
+
+%     A = xcorr(spikes1, spikes2, max_lag, 'coeff');
+%     A_all = [A_all A];
+    A = xcorr(spikes1, spikes2, max_lag);
+    [maxv, maxi] = max(A);
+    a = round(0.001/bin_size)+max_lag;
+    b = conv(A, ones(1, 11), 'valid');
+    ratio = (sum(A(a:a+10)) + sum(A(max_lag*2-a-10:max_lag*2-a)) - min(A)*22)/(min(b)*2 - min(A)*22);
+
+    [h, filteredA] = find_smallest_h(A);
+    [bootstat,bootsam] = bootstrp(N,@find_smallest_h_hist,rude(round(filteredA), 1:max_lag*2+1), max_lag);
+    p = sum(bootstat > h)/N;
+    subplot(5, 6, cp)
+%     if p(c1, c2) < 0.05 && ratio(c1, c2) > 2 && maxi(c1, c2) > 0.75*max_lag && maxi(c1, c2) < 1.25*max_lag+1 && maxv(c1, c2) > 10
+    if p < 0.05 && ratio > 2 && maxi > 0.75*max_lag && maxi < 1.25*max_lag+1 && maxv > 10
+       bar(xx, A, 'k')
+    else
+       bar(xx, A, 'r')
+    end
+%     title([num2str(id1) '  ' num2str(id2) '  ' num2str(p(find(id_dir{1} == id1), find(id_dir{1} == id2)))])
+    xlim([-0.01 0.01])
+    title([num2str(id1) '  ' num2str(id2)])
+
+end
+
+%%
+duration = 2700/2;
+bin_size = 0.00025;
+max_lag = 40;
+ct = 1;
+N = 10000; 
+xx = -max_lag*bin_size:bin_size:max_lag*bin_size;
+FigHandle = figure;
+set(FigHandle, 'Position', [1 1 2000 2000])
+A_all = [];
+for i = 1:3
+    indices = [1 12 10];
+    cp = indices(i);
+%     id1 = corr_cells(cp, 1);
+%     id2 = corr_cells(cp, 2);
+    
+    id1 = neighbors(cp, 1);
+    id2 = neighbors(cp, 2);
+
+    idx1 = get_cell_indices(datawn, id1);
+    idx2 = get_cell_indices(datawn, id2);
+    spikes1 = datawn.spikes{idx1};
+    spikes1(spikes1 > duration) = [];
+    spikes1_TF= ceil(spikes1/bin_size);
+    spikes1 = zeros(duration/bin_size, 1);
+    spikes1(spikes1_TF) = 1;
+
+    spikes2 = datawn.spikes{idx2};
+    spikes2(spikes2 > duration) = [];
+    spikes2_TF= ceil(spikes2/bin_size);
+    spikes2 = zeros(duration/bin_size, 1);
+    spikes2(spikes2_TF) = 1;
+
+    A = xcorr(spikes1, spikes2, max_lag, 'coeff');
+%     A_all = [A_all A];
+%     A = xcorr(spikes1, spikes2, max_lag);
+%     [maxv(cp), maxi(cp)] = max(A);
+%     a = round(0.001/bin_size)+max_lag;
+%     b = conv(A, ones(1, 11), 'valid');
+%     ratio(cp) = (sum(A(a:a+10)) + sum(A(max_lag*2-a-10:max_lag*2-a)) - min(A)*22)/(min(b)*2 - min(A)*22);
+% 
+%     [h, filteredA] = find_smallest_h(A);
+%     [bootstat,bootsam] = bootstrp(N,@find_smallest_h_hist,rude(round(filteredA), 1:max_lag*2+1), max_lag);
+%     p(cp) = sum(bootstat > h)/N;
+    subplot(1, 3, i)
+% %     if p(c1, c2) < 0.05 && ratio(c1, c2) > 2 && maxi(c1, c2) > 0.75*max_lag && maxi(c1, c2) < 1.25*max_lag+1 && maxv(c1, c2) > 10
+%     if p(cp) < 0.05 && ratio(cp) > 2 && maxi(cp) > 0.75*max_lag && maxi(cp) < 1.25*max_lag+1
+       bar(xx, A, 'k')
+%     else
+%        bar(xx, A, 'r')
+%     end
+%     title([num2str(id1) '  ' num2str(id2) '  ' num2str(p(find(id_dir{1} == id1), find(id_dir{1} == id2)))])
+    xlim([-0.01 0.01])
+    title([num2str(id1) '  ' num2str(id2)])
+
+end
+
+
+%%
+duration = 2700;
+bin_size = 0.00025;
+max_lag = 40;
+ct = 1;
+N = 10000; 
+xx = -max_lag*bin_size:bin_size:max_lag*bin_size;
+FigHandle = figure;
+set(FigHandle, 'Position', [1 1 2000 2000])
+A_all = [];
+for cp = 1:length(corr_cells)
+    id1 = corr_cells(cp, 1);
+    id2 = corr_cells(cp, 2);
+    
+%     id1 = neighbors(cp, 1);
+%     id2 = neighbors(cp, 2);
+
+    idx1 = get_cell_indices(datawn, id1);
+    idx2 = get_cell_indices(datawn, id2);
+    spikes1 = datawn.spikes{idx1};
+    spike_n = min(5500, length(spikes1));
+    spikes1 = spikes1(1:spike_n);
+    spikes1_TF= ceil(spikes1/bin_size);
+    spikes1 = zeros(duration/bin_size, 1);
+    spikes1(spikes1_TF) = 1;
+
+    spikes2 = datawn.spikes{idx2};
+    spike_n = min(5500, length(spikes2));
+    spikes2 = spikes2(1:spike_n);
+    spikes2_TF= ceil(spikes2/bin_size);
+    spikes2 = zeros(duration/bin_size, 1);
+    spikes2(spikes2_TF) = 1;
+
+%     A = xcorr(spikes1, spikes2, max_lag, 'coeff');
+%     A_all = [A_all A];
+    A = xcorr(spikes1, spikes2, max_lag);
+    [maxv(cp), maxi(cp)] = max(A);
+    a = round(0.001/bin_size)+max_lag;
+    b = conv(A, ones(1, 11), 'valid');
+    ratio(cp) = (sum(A(a:a+10)) + sum(A(max_lag*2-a-10:max_lag*2-a)) - min(A)*22)/(min(b)*2 - min(A)*22);
+
+    [h, filteredA] = find_smallest_h(A);
+    [bootstat,bootsam] = bootstrp(N,@find_smallest_h_hist,rude(round(filteredA), 1:max_lag*2+1), max_lag);
+    p(cp) = sum(bootstat > h)/N;
+    subplot(5, 6, cp)
+% %     if p(c1, c2) < 0.05 && ratio(c1, c2) > 2 && maxi(c1, c2) > 0.75*max_lag && maxi(c1, c2) < 1.25*max_lag+1 && maxv(c1, c2) > 10
+    if p(cp) < 0.05 && ratio(cp) > 2 && maxi(cp) > 0.75*max_lag && maxi(cp) < 1.25*max_lag+1
+       bar(xx, A, 'k')
+    else
+       bar(xx, A, 'r')
+    end
+%     title([num2str(id1) '  ' num2str(id2) '  ' num2str(p(find(id_dir{1} == id1), find(id_dir{1} == id2)))])
+    xlim([-0.01 0.01])
+    title([num2str(id1) '  ' num2str(id2)])
+
+end

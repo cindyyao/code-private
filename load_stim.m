@@ -147,6 +147,8 @@ clear s
                         
                     % martin's old code -- gdf doesn't think it does the
                     % right thing
+                    
+                    % old code -- xy commented out below 2016-08
 %                     s.params.(t{j})=s.combinations(1).(t{j});
 %                     tt=0;
 %                     for jj=2:length(s.combinations)
@@ -193,7 +195,7 @@ elseif ~isempty(p.Results.user_defined_trigger_interval)
     % define new stimulus trigger interval
     stim_interval = p.Results.user_defined_trigger_interval; % units are seconds
     % find the triggers that are closest to occuring subsequent to these intervals
-    stim_trigger_indices = find(mod(datarun.triggers,stim_interval) < 0.1);
+    stim_trigger_indices = find(mod(datarun.triggers,stim_interval) < 0.1 | mod(datarun.triggers,stim_interval) > stim_interval - 0.1);
     % set the triggers
     triggers = datarun.triggers(stim_trigger_indices)';
 

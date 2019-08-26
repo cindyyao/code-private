@@ -22,7 +22,7 @@ else
 end
 
 current_path = pwd;
-cd('/Users/xyao/Documents/Field-lab/Photons/Classes')
+cd('/Users/xyao/Field-lab/Photons/Classes')
 load(stim_path)
 cd(current_path)
 

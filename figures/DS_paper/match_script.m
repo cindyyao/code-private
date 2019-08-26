@@ -1,12 +1,12 @@
 opt = struct('load_params', 1,'load_neurons', 1, 'load_ei', 1);
-datarun{1} = load_data('/Volumes/lab/analysis/2016-01-15-0/data012-sorted/data012-sorted', opt);
-datarun{1}.names.stimulus_path = '/Volumes/lab/analysis/2016-01-15-0/stimuli/s12.mat';
+datarun{1} = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-01-15-0/data012-sorted/data012-sorted', opt);
+datarun{1}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-01-15-0/stimuli/s12.mat';
 datarun{1} = load_stim_matlab(datarun{1}, 'user_defined_trigger_interval', 10);
-datarun{2} = load_data('/Volumes/lab/analysis/2016-01-30-0/data013-map/data013-map', opt);
-datarun{2}.names.stimulus_path = '/Volumes/lab/analysis/2016-01-30-0/stimuli/s13.mat';
+datarun{2} = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-01-30-0/data013-map/data013-map', opt);
+datarun{2}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-01-30-0/stimuli/s13.mat';
 datarun{2} = load_stim_matlab(datarun{2}, 'user_defined_trigger_interval', 10);
-datarun{3} = load_data('/Volumes/lab/analysis/2016-03-04-0/data003/data003', opt);
-datarun{3}.names.stimulus_path = '/Volumes/lab/analysis/2016-03-04-0/stimuli/s03.mat';
+datarun{3} = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-03-04-0/data003/data003', opt);
+datarun{3}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-03-04-0/stimuli/s03.mat';
 datarun{3} = load_stim_matlab(datarun{3}, 'user_defined_trigger_interval', 10);
 
 pos = datarun{1}.ei.position;

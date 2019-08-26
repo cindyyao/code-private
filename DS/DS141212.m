@@ -21,20 +21,20 @@ datadg{5} = load_data('/Analysis/xyao/2014-12-12-0/data013-map/data013-map', opt
 datadg{5}.names.stimulus_path = '/Analysis/xyao/2014-12-12-0/stimuli/s13.mat';
 datadg{5} = load_stim_matlab(datadg{5}, 'user_defined_trigger_interval', 10);
 
-datamb{1} = load_data('/Analysis/xyao/2014-12-12-0/data000-map/data000-map', opt);
-datamb{1}.names.stimulus_path = '/Analysis/xyao/2014-12-12-0/stimuli/s00.mat';
+datamb{1} = load_data('/Volumes/lab/analysis/2014-12-12-0/data000-map/data000-map', opt);
+datamb{1}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s00.mat';
 datamb{1} = load_stim_matlab(datamb{1});
-datamb{2} = load_data('/Analysis/xyao/2014-12-12-0/data003-map/data003-map', opt);
-datamb{2}.names.stimulus_path = '/Analysis/xyao/2014-12-12-0/stimuli/s03.mat';
+datamb{2} = load_data('/Volumes/lab/analysis/2014-12-12-0/data003-map/data003-map', opt);
+datamb{2}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s03.mat';
 datamb{2} = load_stim_matlab(datamb{2});
-datamb{3} = load_data('/Analysis/xyao/2014-12-12-0/data006-map/data006-map', opt);
-datamb{3}.names.stimulus_path = '/Analysis/xyao/2014-12-12-0/stimuli/s06.mat';
+datamb{3} = load_data('/Volumes/lab/analysis/2014-12-12-0/data006-map/data006-map', opt);
+datamb{3}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s06.mat';
 datamb{3} = load_stim_matlab(datamb{3});
-datamb{4} = load_data('/Analysis/xyao/2014-12-12-0/data009-map/data009-map', opt);
-datamb{4}.names.stimulus_path = '/Analysis/xyao/2014-12-12-0/stimuli/s09.mat';
+datamb{4} = load_data('/Volumes/lab/analysis/2014-12-12-0/data009-map/data009-map', opt);
+datamb{4}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s09.mat';
 datamb{4} = load_stim_matlab(datamb{4});
-datamb{5} = load_data('/Analysis/xyao/2014-12-12-0/data012-map/data012-map', opt);
-datamb{5}.names.stimulus_path = '/Analysis/xyao/2014-12-12-0/stimuli/s12.mat';
+datamb{5} = load_data('/Volumes/lab/analysis/2014-12-12-0/data012-map/data012-map', opt);
+datamb{5}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s12.mat';
 datamb{5} = load_stim_matlab(datamb{5});
 
 dataffp{1} = load_data('/Analysis/xyao/2014-12-12-0/data002-map/data002-map', opt);
@@ -47,6 +47,22 @@ dataffp{4} = load_data('/Analysis/xyao/2014-12-12-0/data011-map/data011-map', op
 dataffp{4}.triggers = dataffp{4}.triggers(2:end);
 dataffp{5} = load_data('/Analysis/xyao/2014-12-12-0/data014-map/data014-map', opt);
 dataffp{5}.triggers = dataffp{5}.triggers(2:end);
+%%
+datadg{1} = load_data('/Volumes/lab/analysis/2014-12-12-0/data001-map/data001-map', opt);
+datadg{1}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s01.mat';
+datadg{1} = load_stim_matlab(datadg{1}, 'user_defined_trigger_interval', 10);
+datadg{2} = load_data('/Volumes/lab/analysis/2014-12-12-0/data004-map/data004-map', opt);
+datadg{2}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s04.mat';
+datadg{2} = load_stim_matlab(datadg{2}, 'user_defined_trigger_interval', 10);
+datadg{3} = load_data('/Volumes/lab/analysis/2014-12-12-0/data007-map/data007-map', opt);
+datadg{3}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s07.mat';
+datadg{3} = load_stim_matlab(datadg{3}, 'user_defined_trigger_interval', 10);
+datadg{4} = load_data('/Volumes/lab/analysis/2014-12-12-0/data010-map/data010-map', opt);
+datadg{4}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s10.mat';
+datadg{4} = load_stim_matlab(datadg{4}, 'user_defined_trigger_interval', 10);
+datadg{5} = load_data('/Volumes/lab/analysis/2014-12-12-0/data013-map/data013-map', opt);
+datadg{5}.names.stimulus_path = '/Volumes/lab/analysis/2014-12-12-0/stimuli/s13.mat';
+datadg{5} = load_stim_matlab(datadg{5}, 'user_defined_trigger_interval', 10);
 
 %% Moving Bar
 
@@ -274,7 +290,7 @@ end
 
 [raster_dg, DG, trial_dur, raster_p_sum, p_idx] = deal(cell(n, 1));
 for i = 1:n    
-    [NumSpikesCell, StimComb] = get_spikescellstim(datadg{i},ds_id,0);
+    [NumSpikesCell, ~,StimComb] = get_spikescellstim(datadg{i},ds_id,0,1);
     DG{i} = sort_direction(dscellanalysis(NumSpikesCell, StimComb));
     raster_dg{i} = get_ds_raster(datadg{i}, ds_id);
     for j = 1:length(raster_dg{i})
@@ -304,6 +320,7 @@ ll = {'NDF4', 'NDF3', 'NDF2', 'NDF1', 'NDF0'};
 dirn = 4;
 D = 4;
 T = 2;
+color = 'brgkc';
 
 for d = 1:n
     p_direction = DG{D}.angle{T}';
@@ -833,4 +850,71 @@ hold on
 for i = 1:length(id)
     compass(MB{d}.U{t}(ds_id == id(i)), MB{d}.V{t}(ds_id == id(i)), 'r')
 end
+%% fit direction tuning curves
+T = 1;
+DG_cut = DG;
+for dir = 1:4
+    figure
+    for i = 1:5
+        CC = 1;
+        for cc = 1:length(id_dir{dir})
+            if ~(dg_idx(idx_dir{dir}(cc), i))
+                xdata = DG_cut{i}.theta{1}(idx_dir{dir}(cc), :);
+                ydata = DG_cut{i}.rho{T}(idx_dir{dir}(cc), :);
+                [f, g] = fit_cos(xdata, ydata);
+                Ymax{dir}{i}(CC) = f.ymax;
+                Phi{dir}{i}(CC) = f.phi;
+                Alpha{dir}{i}(CC) = f.alpha;
+                Width{dir}{i}(CC) = acos(2*0.5^(1/f.alpha) - 1)/pi*360;
+                B{dir}{i}(CC) = f.b;
+                CC = CC + 1;
+                
+                xfit = linspace(0, 2*pi, 100);
+                yfit = f.ymax.*(0.5+0.5*cos(xfit+f.phi)).^f.alpha+f.b;
+                subplot(4, 6, cc)
+                plot(xdata, ydata, 'b')
+                hold on
+                plot(xfit, yfit, 'r')
+                ylim([0 1.1])
+                width = acos(2 * (0.5.^(1/f.alpha) - 0.5))/pi*360;
+                title(['width = ', num2str(width)])
 
+
+            end
+        end
+        Ymax_mean(dir, i) = robust_mean(Ymax{dir}{i});
+        Phi_mean(dir, i) = robust_mean(Phi{dir}{i});
+        Alpha_mean(dir, i) = robust_mean(Alpha{dir}{i});
+        B_mean(dir, i) = robust_mean(B{dir}{i});
+    end
+end
+
+
+for dir = 1:4
+    figure
+
+    for i = 1:5
+        subplot(2, 3, i)
+        hist(Width{dir}{i})
+        title(num2str(mean(Width{dir}{i})))
+    end
+end
+
+for i = 1:5
+    for dir = 1:4
+        WidthMean(dir, i) = mean(Width{dir}{i});
+        WidthSte(dir, i) = std(Width{dir}{i})/sqrt(length(Width{dir}{i}));
+    end
+end
+
+marker = 'xosd';
+figure
+for dir = 1:4
+    errorbar(0:4, WidthMean(dir, :), WidthSte(dir, :), 'Color', 'k', 'Marker', marker(dir), 'MarkerSize', 10)
+    hold on
+end
+legend('superior', 'anterior', 'inferior', 'posterior')
+ylim([0 300])
+xlabel('light level')
+ylabel('tuning width (degree)')
+xlim([-0.5 4.5])

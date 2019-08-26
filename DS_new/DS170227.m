@@ -3,8 +3,8 @@ cd /Users/xyao/matlab/code-private/DS_new/
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 
 % load drifting grating data
-datadg = load_data('/Volumes/lab/analysis/2017-02-27-0/data005-006-sorted/data005-006-sorted', opt);
-datadg.names.stimulus_path = '/Volumes/lab/analysis/2017-02-27-0/stimuli/s0506.txt';
+datadg = load_data('/Volumes/lab/Experiments/Array/Analysis/2017-02-27-0/data005-006-sorted/data005-006-sorted', opt);
+datadg.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2017-02-27-0/stimuli/s0506.txt';
 datadg = load_stim(datadg, 'user_defined_trigger_interval', 10);
 
 % identify DS cells
@@ -17,7 +17,7 @@ params_idx = [3 2]; % which parameters to use for classification
 [NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg,ds_id,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
 
-datarun = load_data('/Volumes/lab/analysis/2017-02-27-0/data000-003-map/data000-003-map', opt);
+datarun = load_data('/Volumes/lab/Experiments/Array/Analysis/2017-02-27-0/data000-003-map/data000-003-map', opt);
 dataflash = split_datarun(datarun, [3232 6874 10334]);
 dataflash{1}.DfParams.NDF =   [5,5,5,5,4,4,4,4,4,3,3,3,2,2] ; % on filter turret 
 dataflash{1}.DfParams.Ftime = [1,2,4,8,2,3,4,6,8,2,4,8,2,8] ; % ms
@@ -34,6 +34,8 @@ dataflash{3}.DfParams.interFlashInt = [3] ; % sec
 dataflash{4}.DfParams.NDF =   [5,5,5,5,4,4,4,4,4,3,3,3,2,2] ; % on filter turret 
 dataflash{4}.DfParams.Ftime = [1,2,4,8,2,3,4,6,8,2,4,8,2,8] ; % ms
 dataflash{4}.DfParams.interFlashInt = [3] ; % sec
+
+load('DS170227.mat')
 %% dg
 % ds_id = datadg.cell_ids;
 n = 1;
@@ -146,6 +148,7 @@ interFlashIntVar = 0.005; % (sec) expected precision of trigger intervals
 
 %% find sets of flash stimuli
 trigger = {[1:3:300], [601:3:900], [601:3:900], [1:3:300]};
+fig_title = {'control', 'TPMPA', 'TPMPA+SR', 'wash'};
 for ds = 1:4
 clear trigger_set_i
 ts = 1; 
@@ -223,6 +226,7 @@ for cc = 1:length(ds_id_flash)
     ds_dark_raster_all{cc} = sort(cell2mat(ds_dark_raster{cc}));
     ds_dark_hist_mean{cc} = hist(ds_dark_raster_all{cc}, XX)/length(trigger{ds});
 end
+DS_dark_raster_all(:, ds) = ds_dark_raster_all;
 
 %% 2 alternative forced choice test
 % use 400-580 second (roughly) as dark trials
@@ -265,15 +269,22 @@ color = 'rbgk';
 figure(1)
 subplot(2,2,ds)
 for ct = 1:4
-    plot(log10(Irel), Pc(idx_dir_flash{ct}, :)', 'color', color(ct))
+    if ct == 3
+        plot(log10(Irel), Pc(idx_dir_flash{ct}([1 3]), :)', 'color', color(ct))
+    else
+        plot(log10(Irel), Pc(idx_dir_flash{ct}, :)', 'color', color(ct))
+    end
     hold on
 end
 xlabel('log(R*/rod)')
 ylabel('probability')
-title('wash')
+title(fig_title{ds})
 % compare across cell type
 for ct = 1:4
     Pc_dir{ct} = Pc(idx_dir_flash{ct}, :);
+    if ct == 3
+        Pc_dir{ct}(2, :) = [];
+    end
     Pc_dir_mean(ct, :) = mean(Pc_dir{ct}, 1);
     Pc_dir_ste(ct, :) = std(Pc_dir{ct}, [], 1)/sqrt(length(idx_dir_flash{ct}));
 end
@@ -285,21 +296,22 @@ for ct = 1:4
     errorbar(log10(Irel), Pc_dir_mean(ct, :), Pc_dir_ste(ct, :), 'color', color(ct));
     hold on
 end
-legend('superior', 'Anterior', 'inferior', 'posterior')
+legend('superior', 'Anterior', 'inferior', 'posterior', 'location', 'northwest')
 xlabel('log(R*/rod)')
 ylabel('probability')
-title('wash')
-end
+title(fig_title{ds})
+ylim([0.45 1])
 
+end
 
 %% raster plot
 
 a = ceil((length(trigger_set_i)+1)/2);
-for cc =3:3%length(ds_id_flash);
+for cc =1:length(ds_id_flash);
     ts = 1;
     b = 1;
     trial_n = length(ds_dark_raster{1});
-    FigHandle = figure;
+    FigHandle = figure(10);
     set(FigHandle, 'Position', [0, 0, 1920, 1080]);
     while ts <= length(trigger_set_i)+1
         if  ts == a+1
@@ -338,7 +350,20 @@ for cc =3:3%length(ds_id_flash);
         ts = ts+1;
     end
 
-%     print_close(1, [24 12], num2str(ds_id_flash(cc)))
+    print_close(10, [24 12], [num2str(ds_id_flash(cc)) '_' num2str(ds)])
 
 end
 
+%%
+DS_dark_spike = cellfun(@length, DS_dark_raster_all)/300;
+DS_dark_spike_superior = DS_dark_spike(idx_dir_flash{1}, [1 3]);
+DS_dark_spike_other = DS_dark_spike(sort(cell2mat(idx_dir_flash(2:4)')), [1 3]);
+
+figure
+errorbar(mean(DS_dark_spike_other), mean(DS_dark_spike_superior), std(DS_dark_spike_superior)/sqrt(size(DS_dark_spike_superior, 1)), 'ko')
+hold on
+herrorbar(mean(DS_dark_spike_other), mean(DS_dark_spike_superior), std(DS_dark_spike_other)/sqrt(size(DS_dark_spike_other, 1)), 'ko')
+plot([0 2], [0 2], 'r--')
+xlabel('others (Hz)')
+ylabel('superior (Hz)')
+ylim([0 2])

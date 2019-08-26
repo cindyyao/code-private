@@ -12,10 +12,10 @@ tpn = size(raster{1}{ii}, 2);
 tt = DS{1}.theta{1}(1, :);
 for time = 1:tpn
     FigHandle = figure;
-%      set(FigHandle, 'Position', [1 1 400 400])
+     set(FigHandle, 'Position', [1 1 400 400])
 %     set(FigHandle, 'Position', [1 1 1400 600])
 %     set(FigHandle, 'Position', [1 1 1620 1080])
-    set(FigHandle, 'Position', [1 1 900 900])
+%     set(FigHandle, 'Position', [1 1 900 900])
     for j = 1:length(DS)
         if ~isempty(raster{j}{cell_idx}) && time <= length(DS{j}.rho)
             h = subplot(4, 4, [6 7 10 11]); 

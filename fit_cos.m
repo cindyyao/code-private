@@ -1,8 +1,9 @@
 function [F, G] = fit_cos(xdata, ydata, varargin)
 
 p = inputParser;
-p.addParamValue('Upper', [(max(ydata)-min(ydata))*1.2, max(xdata), 100, max(min(ydata)*1.1, 0)]);
-p.addParamValue('Lower', [0, min(xdata), 0.01, 0]);
+% p.addParamValue('Upper', [(max(ydata)-min(ydata))*1.2, 2*pi, 10, max(min(ydata), 0)]);
+p.addParamValue('Upper', [max(ydata)*1.2, 2*pi, 10, max(min(ydata), 0)]);
+p.addParamValue('Lower', [0, 0, 0, 0]);
 p.addParamValue('Startpoints', []);
 
 p.parse(varargin{:});

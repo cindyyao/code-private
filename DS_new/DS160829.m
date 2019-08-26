@@ -15,16 +15,16 @@ datadg = load_stim_matlab(datadg, 'user_defined_trigger_interval', 10);
 [NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg,ds_id,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
 
-datafs{1} = load_data('/Volumes/lab/analysis/2016-08-29-0/data000-map/data000-map', opt);
-datafs{1}.names.stimulus_path = '/Volumes/lab/analysis/2016-08-29-0/stimuli/s00.mat';
+datafs{1} = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-08-29-0/data000-map/data000-map', opt);
+datafs{1}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-08-29-0/stimuli/s00.mat';
 datafs{1} = load_stim_matlab(datafs{1});
 
-datafs{2} = load_data('/Volumes/lab/analysis/2016-08-29-0/data001-map/data001-map', opt);
-datafs{2}.names.stimulus_path = '/Volumes/lab/analysis/2016-08-29-0/stimuli/s01.mat';
+datafs{2} = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-08-29-0/data001-map/data001-map', opt);
+datafs{2}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-08-29-0/stimuli/s01.mat';
 datafs{2} = load_stim_matlab(datafs{2});
 
-datafs{3} = load_data('/Volumes/lab/analysis/2016-08-29-0/data004-map/data004-map', opt);
-datafs{3}.names.stimulus_path = '/Volumes/lab/analysis/2016-08-29-0/stimuli/s04.mat';
+datafs{3} = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-08-29-0/data004-map/data004-map', opt);
+datafs{3}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-08-29-0/stimuli/s04.mat';
 datafs{3} = load_stim_matlab(datafs{3});
 
 ds_id_fs = intersect(datafs{3}.cell_ids, ds_id);

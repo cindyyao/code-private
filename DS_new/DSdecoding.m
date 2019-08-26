@@ -33,15 +33,15 @@ c50 = [1.8 1.8 1.8 1.8];
 alpha1 = [7 7 7 7];
 % tuning curve
 phi = [0 1/2 1 3/2]*pi; % preferred direction
-a = 2; b = 1.2;
+a = 2; b = 0.8;
 Alpha2 = [a a a a ; b a a a; b b a a; b b b a; b b b b]; % tuning width 
 r_base = [1 1 1 1]*0.2; % background firing
-ymax = [1 1 1 1]*5;
+ymax = [1 1 1 1]*30;
 
 contrast = [5 10 20 40 80 150 300];
 repeat_n = 1000;
 
-for simrepeat = 1:1
+for simrepeat = 1:100
     for width = 1:size(Alpha2, 1)
         alpha2 = Alpha2(width, :);
         for ctr = 1:length(contrast)
@@ -66,7 +66,8 @@ for simrepeat = 1:1
                         gain = (0.5 + 0.5 * cos(theta + phi)).^alpha2;
                         output = input.*gain + r_base;
                         for i = 1:length(output)
-                            output(i) = random('poiss', output(i));
+%                             output(i) = random('poiss', output(i));
+                            output(i) = random('bino', round(2*output(i)), 0.9);
                         end
 
                         output_r = repmat(output, length(THETA), 1);
@@ -98,14 +99,23 @@ for simrepeat = 1:1
         alpha2 = Alpha2(i, :);
         for ii = 1:length(contrast)
             % run_MLdecoder
-            [error_cone{simrepeat}(i, ii), Theta_e{simrepeat}{i, ii}] = run_poiss_MLdecoder(c50,alpha1,phi,alpha2,r_base,ymax,contrast(ii));
+            [error_cone{simrepeat}(i, ii), Theta_e{simrepeat}{i, ii}] = run_poiss_MLdecoder(c50,alpha1,phi,alpha2,r_base,ymax,contrast(ii),repeat_n);
             disp(['repeat ' num2str(simrepeat) ' discrimination task: tuning width ' num2str(i) ' contrast ' num2str(ii) ' finished.'])
         end
     end
 
-    save('temp.mat', 'Precision_ratio_cone', 'error_cone')
+    save('dsmodel_temp4.mat', 'Precision_ratio_cone', 'error_cone')
 end
 
+% dsmodel_temp3.mat: poiss
+% a = 2; b = 0.8;
+% Alpha2 = [a a a a ; b a a a; b b a a; b b b a; b b b b]; % tuning width 
+% r_base = [1 1 1 1]*0.2; % background firing
+% ymax = [1 1 1 1]*30;
+
+% dsmodel_temp4.mat: bino, p = 0.9
+
+% for other parameters, see /Dropbox/code-private
 %% figure
 %% optimal tuning width
 figure
@@ -253,6 +263,8 @@ end
 %% percentage improvement
 
 % load('dsDetection.mat')
+% load('dsmodel.mat')
+
 contrast = [5 10 20 40 80 150 300];
 error = error_cone;
 Precision_ratio = Precision_ratio_cone;
@@ -281,13 +293,48 @@ ylabel('2AFC performance')
 legend('0 broad', '1 broad', '2 broad', '3 broad', '4 broad')
 
 
-for rep = 1:1
+for rep = 1:8
     error_total_area = sum(error{rep}(5, :) - error{rep}(1, :));
     detection_total_area = sum(Precision_ratio{rep}(5, :) - Precision_ratio{rep}(1, :));
 
     for i = 1:4
         error_improv_rate(rep, i) = sum(error{rep}(i + 1, :) - error{rep}(i, :))/error_total_area;
         detection_improv_rate(rep, i) = sum(Precision_ratio{rep}(i + 1, :) - Precision_ratio{rep}(i, :))/detection_total_area;
+    end
+end
+
+ratio = detection_improv_rate./error_improv_rate;
+
+figure
+errorbar(1:4, mean(error_improv_rate), std(error_improv_rate)/sqrt(10))
+xlabel('# of broad tuning curve')
+ylabel('% worse in discrimination task (beta)')
+xlim([0 5])
+
+figure
+errorbar(1:4, mean(detection_improv_rate), std(detection_improv_rate)/sqrt(10))
+xlabel('# of broad tuning curve')
+ylabel('% better in detection task (alpha)')
+xlim([0 5])
+
+
+figure
+errorbar(1:4, mean(ratio), std(ratio)/sqrt(10))
+hold on
+plot([0 5], [1 1], 'k--')
+% ylim([0.5 1.7])
+xlabel('# of broad tuning curve')
+ylabel('improvemnet index (alpha/beta)')
+xlim([0.5 4.5])
+
+%%
+for rep = 1:8
+    error_total_area = sum(error{rep}(5, :) - error{rep}(1, :));
+    detection_total_area = sum(Precision_ratio{rep}(5, :) - Precision_ratio{rep}(1, :));
+
+    for i = 1:4
+        error_improv_rate(rep, i) = sum(error{rep}(i + 1, :) - error{rep}(i, :))/(90*4);
+        detection_improv_rate(rep, i) = sum(Precision_ratio{rep}(i + 1, :) - Precision_ratio{rep}(i, :))/(0.5*4);
     end
 end
 
@@ -330,3 +377,17 @@ xlim([40 50])
 xlabel('prediction error (deg)')
 ylabel('correct rate')
 title('n = 3')
+
+%% 
+for rep = 1:8
+    score(:, rep) = 1-mean(error{rep}, 2)/90 + (mean(Precision_ratio{rep}, 2)-0.5)/0.5;
+end
+
+figure
+errorbar(0:4, mean(score, 2), std(score, [], 2)/sqrt(rep))
+hold on
+% plot([0 5], [1 1], 'k--')
+% ylim([0.5 1.7])
+xlabel('# of broad tuning curve')
+ylabel('improvemnet index (alpha/beta)')
+% xlim([0.5 4.5])

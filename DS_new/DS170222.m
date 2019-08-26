@@ -37,7 +37,7 @@ dataflash{4}.DfParams.NDF =   [5,5,5,5,4,4,4,4,4,3,3,3,2,2,1] ; % on filter turr
 dataflash{4}.DfParams.Ftime = [1,2,4,8,2,3,4,6,8,2,4,8,2,8,2] ; % ms
 dataflash{4}.DfParams.interFlashInt = [3] ; % sec
 
-
+load('DS170222.mat')
 %%
 d = 1;
 t = 3;
@@ -148,6 +148,7 @@ for cc = 1:length(ds_id_flash)
     ds_dark_raster_all{cc} = sort(cell2mat(ds_dark_raster{cc}));
     ds_dark_hist_mean{cc} = hist(ds_dark_raster_all{cc}, XX)/length(trigger);
 end
+DS_dark_raster_all(:, ds) = ds_dark_raster_all;
 
 %% 2 alternative forced choice test
 % use 400-580 second (roughly) as dark trials
@@ -215,16 +216,16 @@ xlabel('log(R*/rod)')
 ylabel('probability')
 title('wash')
 
-
+end
 
 %% raster plot
 
 a = ceil((length(trigger_set_i)+1)/2);
-for cc =3:3%length(ds_id_flash);
+for cc =1:length(ds_id_flash);
     ts = 1;
     b = 1;
     trial_n = length(ds_dark_raster{1});
-    FigHandle = figure;
+    FigHandle = figure(10);
     set(FigHandle, 'Position', [0, 0, 1920, 1080]);
     while ts <= length(trigger_set_i)+1
         if  ts == a+1
@@ -263,8 +264,20 @@ for cc =3:3%length(ds_id_flash);
         ts = ts+1;
     end
 
-%     print_close(1, [24 12], num2str(ds_id_flash(cc)))
+    print_close(10, [24 12], [num2str(ds_id_flash(cc)) '_' num2str(ds)])
 
 end
 
-end
+%%
+
+DS_dark_spike = cellfun(@length, DS_dark_raster_all)/300;
+DS_dark_spike_superior = DS_dark_spike(idx_dir_flash{1}, :);
+DS_dark_spike_other = DS_dark_spike(sort(cell2mat(idx_dir_flash(2:4)')), :);
+
+figure
+errorbar(mean(DS_dark_spike_other), mean(DS_dark_spike_superior), std(DS_dark_spike_superior)/sqrt(size(DS_dark_spike_superior, 1)), 'ko')
+hold on
+herrorbar(mean(DS_dark_spike_other), mean(DS_dark_spike_superior), std(DS_dark_spike_other)/sqrt(size(DS_dark_spike_other, 1)), 'ko')
+plot([0 2], [0 2], 'r--')
+xlabel('others (Hz)')
+ylabel('superior (Hz)')

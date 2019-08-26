@@ -14,6 +14,8 @@ function [psth,psthTime] = get_smooth_psth(spike_times, trigger_times, varargin)
 %   bin_size    0.1        bins size of PSTH
 %   hist_color  [0 0 0]         color of PSTH
 %   foa         0          calls to set_up_figure_or_axes function,
+% varargin 'tailTime': time at beginging and end of psth that should be
+% guessed (by default this is half the bin width).
 %
 
 % SET UP OPTIONAL ARGUMENTS
@@ -27,6 +29,7 @@ p.addParamValue('bin_size', 0.1, @isnumeric);
 p.addParamValue('hist_color', [0 0 0]);
 p.addParamValue('foa', 0);
 p.addParamValue('labels', true, @islogical);
+p.addParamValue('tailTime', [], @isnumeric); 
 
 % parse inputs
 p.parse(varargin{:});
@@ -55,7 +58,12 @@ SpikeTrain_mean = mean(SpikeTrain,1) ; % average spike train
 SpikeTrain_mean_smooth = smooth(SpikeTrain_mean,params.bin_size*params.sample_rate) ;
 
 % compute the psth
-tailPnts = ceil(params.bin_size*params.sample_rate/2) ; % points before full smooth bin is found
+if isempty(params.tailTime)
+    tailPnts = ceil(params.bin_size*params.sample_rate/2) ; % points before full smooth bin is found
+else
+    tailPnts = ceil(params.tailTime*params.sample_rate) ;
+end
+
 psth = SpikeTrain_mean_smooth * params.sample_rate ; % make units spikes/sec.
 psth(1:tailPnts) = psth(tailPnts+1) ; % guess tail points
 psth(end-tailPnts+1:end) = psth(end-tailPnts-1) ;

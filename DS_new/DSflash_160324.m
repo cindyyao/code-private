@@ -2,18 +2,18 @@ cd /Users/xyao/matlab/code-private/DS_new/
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 
 
-datadg = load_data('/Volumes/lab/analysis/2016-03-24-0/data003-sorted/data003-sorted', opt);
-datadg.names.stimulus_path = '/Volumes/lab/analysis/2016-03-24-0/stimuli/s03.mat';
+datadg = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-03-24-0/data003-sorted/data003-sorted', opt);
+datadg.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2016-03-24-0/stimuli/s03.mat';
 datadg = load_stim_matlab(datadg, 'user_defined_trigger_interval', 10);
 
-dataflash = load_data('/Volumes/lab/analysis/2016-03-24-0/data000-map/data000-map', opt);
+dataflash = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-03-24-0/data000-map/data000-map', opt);
 dataflash.DfParams.NDF =   [5,5,5,4,4,4,4,4,3,3,3,2,2,1,0] ; % on filter turret 
 dataflash.DfParams.Ftime = [2,4,8,2,3,4,6,8,2,4,8,8,2,2,2] ; % ms
 dataflash.DfParams.interFlashInt = [3] ; % sec
 
 
-[NumSpikesCell, ~,StimComb] = get_spikescellstim(datadg,datadg.cell_ids,0,1);
-ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
+[NumSpikesCell, ~,StimComb] = get_spikescellstim(datadg, datadg.cell_ids, 0, 1);
+ds_struct = dscellanalysis(NumSpikesCell, StimComb, datadg);
 params_idx = [4 5]; % which parameters to use for classification
 
 [ds_id, nonds_id, id_init] = classify_ds(datadg, ds_struct, params_idx);
@@ -22,7 +22,7 @@ load('DS160324.mat')
 ds_id_flash = ds_id(flash_idx);
 ds_idx_flash = get_cell_indices(dataflash, ds_id_flash);
 
-datawn = load_data('/Volumes/lab/analysis/2016-03-24-0/data002-map/data002-map', opt);
+datawn = load_data('/Volumes/lab/Experiments/Array/Analysis/2016-03-24-0/data002-map/data002-map', opt);
 
 
 %% 
@@ -292,6 +292,7 @@ end
 
 %% 2 alternative forced choice test
 % use 400-580 second (roughly) as dark trials
+
 window = 1;
 bin_n = window/bin_size;
 
@@ -316,7 +317,8 @@ for cc = 1:length(ds_id_flash)
             corr_flash(t) = ds_flash_hist_trial{cc}{ts}{t}(1:bin_n) * DV(1:bin_n)';
             corr_dark(t) = ds_dark_hist_trial{cc}{t}(1:bin_n) * DV(1:bin_n)';
         end
-        Pc(cc, ts) = (sum(corr_flash > 0) + sum(corr_dark <= 0))/(trial_n*2);
+%         Pc(cc, ts) = (sum(corr_flash > 0) + sum(corr_dark <= 0))/(trial_n*2);
+        Pc(cc, ts) = (sum(corr_flash > corr_dark) + sum(corr_flash == corr_dark)/2)/trial_n;
     end
 end
 
@@ -642,6 +644,7 @@ for cc = 1:length(id_nds_flash{nds_i})
             corr_dark(t) = nds_dark_hist_trial{cc}{t}(1:bin_n) * DV(1:bin_n)';
         end
         nds_Pc(cc, ts) = (sum(corr_flash > 0) + sum(corr_dark <= 0))/(trial_n*2);
+%         nds_Pc(cc, ts) = (sum(corr_flash > corr_dark) + sum(corr_flash == corr_dark)/2)/trial_n;
     end
 end
 

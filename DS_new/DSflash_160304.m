@@ -1,13 +1,14 @@
 cd /Users/xyao/matlab/code-private/DS_new/
+path = '/Volumes/dusom_fieldlab/All_Staff/lab/Experiments/Array/Analysis/2016-03-04-0/';
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 
 
-datadg = load_data('/Volumes/lab/analysis/2016-03-04-0/data003/data003', opt);
-datadg.names.stimulus_path = '/Volumes/lab/analysis/2016-03-04-0/stimuli/s03.mat';
+datadg = load_data(strcat(path, 'data003/data003'), opt);
+datadg.names.stimulus_path = strcat(path, 'stimuli/s03.mat');
 datadg = load_stim_matlab(datadg, 'user_defined_trigger_interval', 10);
 
 % dataflash = load_data('/Volumes/lab/analysis/2016-02-19-0/data001/data001', opt);
-dataflash = load_data('/Volumes/lab/analysis/2016-03-04-0/data000-map/data000-map', opt);
+dataflash = load_data(strcat(path, 'data000-map/data000-map'), opt);
 % dataflash = load_data('/Volumes/lab/analysis/2016-03-04-0/data000-map-002/data000-map-002', opt);
 dataflash.DfParams.NDF =   [5,5,5,4,4,4,4,4,3,3,3,2,2,1,0] ; % on filter turret 
 dataflash.DfParams.Ftime = [2,4,8,2,3,4,6,8,2,4,8,2,4,2,2] ; % ms
@@ -26,7 +27,7 @@ load('DS160304.mat')
 ds_id_flash = ds_id(flash_idx);
 ds_idx_flash = get_cell_indices(dataflash, ds_id_flash);
 
-datawn = load_data('/Volumes/lab/analysis/2016-03-04-0/data002/data002', opt);
+datawn = load_data(strcat(path, 'data002/data002'), opt);
 
 %% 
 
@@ -45,12 +46,12 @@ raster_dg{i} = get_ds_raster(datadg, ds_id);
 %     end
 
 % firing rate
-n = 1;
-i = 1;
-[raster_dg, DG, ~, raster_p_sum, p_idx] = deal(cell(n, 1));
-[NumSpikesCell,MaxRate, StimComb] = get_spikescellstim(datadg,ds_id,0,0.05);
-DG{i} = sort_direction(dscellanalysis(MaxRate, StimComb,datadg));
-raster_dg{i} = get_ds_raster(datadg, ds_id);
+% n = 1;
+% i = 1;
+% [raster_dg, DG, ~, raster_p_sum, p_idx] = deal(cell(n, 1));
+% [NumSpikesCell,MaxRate, StimComb] = get_spikescellstim(datadg,ds_id,0,0.05);
+% DG{i} = sort_direction(dscellanalysis(MaxRate, StimComb,datadg));
+% raster_dg{i} = get_ds_raster(datadg, ds_id);
 
 delta_p = 4; % choose which params to use to calculate prefer direction indices 
 MAG_all_norm_dg = cell(n, 1);
@@ -194,7 +195,7 @@ for i = 1:dirn
     hold on
     [x, y] = ginput;
     plot(x, y, color(i));
-
+    
     IN = inpolygon(DG{d}.U{t}(idx_sub{2}), DG{d}.V{t}(idx_sub{2}), x, y);
     [~, I] = find(IN == 1);
     idx_dir{i} = idx_sub{2}(I);
@@ -315,16 +316,19 @@ for cc = 1:length(ds_id_flash)
         ds_flash_hist_sum = sum(cell2mat(ds_flash_hist_trial{cc}{ts}'));
         for t = 1:trial_n
             template_flash = ds_flash_hist_sum - ds_flash_hist_trial{cc}{ts}{t};
+            template_flash = template_flash(1:bin_n);
             template_flash = template_flash/norm(template_flash);
             template_flash(isnan(template_flash)) = 0;
             template_dark = ds_dark_hist_sum - ds_dark_hist_trial{cc}{t};
+            template_dark = template_dark(1:bin_n);
             template_dark = template_dark/norm(template_dark);
             template_dark(isnan(template_dark)) = 0;
             DV = template_flash - template_dark;
             corr_flash(t) = ds_flash_hist_trial{cc}{ts}{t}(1:bin_n) * DV(1:bin_n)';
             corr_dark(t) = ds_dark_hist_trial{cc}{t}(1:bin_n) * DV(1:bin_n)';
         end
-        Pc(cc, ts) = (sum(corr_flash > 0) + sum(corr_dark <= 0))/(trial_n*2);
+        Pc(cc, ts) = (sum(corr_flash > corr_dark) + sum(corr_flash == corr_dark)/2)/trial_n;
+%         Pc(cc, ts) = (sum(corr_flash > 0) + sum(corr_dark <= 0))/(trial_n*2);
     end
 end
 
@@ -686,7 +690,7 @@ idx_nds_flash{3} = get_cell_indices(dataflash, id_nds_flash{3});
 id_nds_flash{4} = intersect(get_cell_ids(datawn,'OFF sustained'), dataflash.cell_ids);
 idx_nds_flash{4} = get_cell_indices(dataflash, id_nds_flash{4});
 
-nds_i = 4;
+nds_i = 2;
 
 % trigger_set_i{3} = trigger_set_i{3}(1:30);
 % trigger_set_i{4} = trigger_set_i{4}(30:end);
@@ -698,7 +702,6 @@ XX = start+bin_size/2:bin_size:dataflash.DfParams.interFlashInt-bin_size/2;
 % load /Volumes/lab/Experiments/Calibration/NdfCalibration
 Irel = (dataflash.DfParams.Ftime/1000).*NdfCalibration(2,dataflash.DfParams.NDF+1) ;
 [Irel, i] = sort(Irel);
-
 
 nds_flash_raster = cell(length(id_nds_flash{nds_i}), 1);
 nds_flash_hist_trial = cell(length(id_nds_flash{nds_i}), 1);
@@ -773,24 +776,24 @@ for cc = 1:length(id_nds_flash{nds_i})
 end
 
 
-color = 'rbgk';
-figure
-for i = 1:size(nds_Pc, 1)
-    plot(log10(Irel), nds_Pc(i, :), 'color', 'r')
-    hold on
-%     pause
-end
-xlabel('log(R*/rod)')
-ylabel('probability')
-
-figure
-errorbar(log10(Irel), mean(nds_Pc), std(nds_Pc)/sqrt(size(nds_Pc, 1)));
+% color = 'rbgk';
+% figure
+% for i = 1:size(nds_Pc, 1)
+%     plot(log10(Irel), nds_Pc(i, :), 'color', 'r')
+%     hold on
+% %     pause
+% end
+% xlabel('log(R*/rod)')
+% ylabel('probability')
+% 
+% figure
+% errorbar(log10(Irel), mean(nds_Pc), std(nds_Pc)/sqrt(size(nds_Pc, 1)));
 
 
 %% raster plot
 
 a = ceil((length(trigger_set_i)+1)/2);
-for cc = 5:5%length(id_nds_flash{2});
+for cc = 1:12%length(id_nds_flash{nds_i});
     ts = 1;
     b = 1;
     trial_n = length(nds_dark_raster{2});
@@ -817,9 +820,9 @@ for cc = 5:5%length(id_nds_flash{2});
             axis([0, 3, 0, trial_n]);
             hold on
         end
-        if b == 1
-            title(num2str(id_nds_flash{nds_i}(cc)))
-        end
+%         if b == 1
+%             title(num2str(id_nds_flash{nds_i}(cc)))
+%         end
         b = b+1;
         subplot(a, 4, b)
         if ts > 1
@@ -833,10 +836,10 @@ for cc = 5:5%length(id_nds_flash{2});
         ts = ts+1;
     end
 
-%     print_close(1, [24 12], num2str(id_nds_flash{2}(cc)))
+%     print_close(1, [24 12], num2str(id_nds_flash{nds_i}(cc)))
+    print_close(1, [24 12], num2str(cc))
 
 end
-
 
 %% fit
 color = 'brgkc';

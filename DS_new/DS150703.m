@@ -3,37 +3,37 @@ cd /Users/xyao/matlab/code-private/DS_new/
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
 
 
-datadg{1} = load_data('/Volumes/lab/analysis/2015-07-03-0/data000-map/data000-map', opt);
-datadg{1}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s00.mat';
+datadg{1} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data000-map/data000-map', opt);
+datadg{1}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s00.mat';
 datadg{1} = load_stim_matlab(datadg{1}, 'user_defined_trigger_interval', 10);
-datadg{2} = load_data('/Volumes/lab/analysis/2015-07-03-0/data003-map/data003-map', opt);
+datadg{2} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data003-map/data003-map', opt);
 % datadg{2} = load_data('/Analysis/xyao/2015-07-03-0/data003/data003', opt);
-datadg{2}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s03.mat';
+datadg{2}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s03.mat';
 datadg{2} = load_stim_matlab(datadg{2}, 'user_defined_trigger_interval', 10);
-datadg{3} = load_data('/Volumes/lab/analysis/2015-07-03-0/data006-map/data006-map', opt);
-datadg{3}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s06.mat';
+datadg{3} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data006-map/data006-map', opt);
+datadg{3}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s06.mat';
 datadg{3} = load_stim_matlab(datadg{3}, 'user_defined_trigger_interval', 10);
-datadg{4} = load_data('/Volumes/lab/analysis/2015-07-03-0/data009-map/data009-map', opt);
-datadg{4}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s09.mat';
+datadg{4} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data009-map/data009-map', opt);
+datadg{4}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s09.mat';
 datadg{4} = load_stim_matlab(datadg{4}, 'user_defined_trigger_interval', 10);
-datadg{5} = load_data('/Volumes/lab/analysis/2015-07-03-0/data012-map/data012-map', opt);
-datadg{5}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s12.mat';
+datadg{5} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data012-map/data012-map', opt);
+datadg{5}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s12.mat';
 datadg{5} = load_stim_matlab(datadg{5}, 'user_defined_trigger_interval', 10);
 
-datamb{1} = load_data('/Volumes/lab/analysis/2015-07-03-0/data001-map/data001-map', opt);
-datamb{1}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s01.mat';
+datamb{1} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data001-map/data001-map', opt);
+datamb{1}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s01.mat';
 datamb{1} = load_stim_matlab(datamb{1});
-datamb{2} = load_data('/Volumes/lab/analysis/2015-07-03-0/data004-map/data004-map', opt);
-datamb{2}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s04.mat';
+datamb{2} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data004-map/data004-map', opt);
+datamb{2}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s04.mat';
 datamb{2} = load_stim_matlab(datamb{2});
-datamb{3} = load_data('/Volumes/lab/analysis/2015-07-03-0/data007-map/data007-map', opt);
-datamb{3}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s07.mat';
+datamb{3} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data007-map/data007-map', opt);
+datamb{3}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s07.mat';
 datamb{3} = load_stim_matlab(datamb{3});
-datamb{4} = load_data('/Volumes/lab/analysis/2015-07-03-0/data010-map/data010-map', opt);
-datamb{4}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s10.mat';
+datamb{4} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data010-map/data010-map', opt);
+datamb{4}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s10.mat';
 datamb{4} = load_stim_matlab(datamb{4});
-datamb{5} = load_data('/Volumes/lab/analysis/2015-07-03-0/data014-map/data014-map', opt);
-datamb{5}.names.stimulus_path = '/Volumes/lab/analysis/2015-07-03-0/stimuli/s14.mat';
+datamb{5} = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data014-map/data014-map', opt);
+datamb{5}.names.stimulus_path = '/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/stimuli/s14.mat';
 datamb{5} = load_stim_matlab(datamb{5});
 
 dataffp{1} = load_data('/Volumes/lab/analysis/2015-07-03-0/data002-map/data002-map', opt);
@@ -47,8 +47,12 @@ dataffp{4}.triggers = dataffp{4}.triggers(2:end);
 dataffp{5} = load_data('/Volumes/lab/analysis/2015-07-03-0/data015-map/data015-map', opt);
 dataffp{5}.triggers = dataffp{5}.triggers(2:end);
 
-datarun = load_data('/Analysis/xyao/2015-07-03-0/data016/data016', opt);
-
+datawn = load_data('/Volumes/lab/Experiments/Array/Analysis/2015-07-03-0/data016-map/data016-map', opt);
+datawn = load_sta(datawn);
+datawn = get_sta_summaries(datawn, 'all');
+% datarun = load_data('/Analysis/xyao/2015-07-03-0/data016/data016', opt);
+% datawn = load_data('/Volumes/lab/analysis/2015-07-03-0/data016-map/data016-map', opt);
+datawn = load_ei(datawn, id_dir{4});
 %%
 n = 5;
 i = 5;
@@ -79,8 +83,8 @@ end
 % max firing rate
 load('DS150703-1.mat')
 [raster_dg, DG, ~, raster_p_sum, p_idx] = deal(cell(n, 1));
-for i = 1:n    
-    [NumSpikesCell, MaxRate, StimComb] = get_spikescellstim(datadg{i},ds_id,0,0.05);
+for i = 1:n
+    [NumSpikesCell, MaxRate, StimComb] = get_spikescellstim(datadg{i},ds_id,0,1.5);
     DG{i} = sort_direction(dscellanalysis(MaxRate, StimComb,datadg{i}));
     raster_dg{i} = get_ds_raster(datadg{i}, ds_id);
     for j = 1:length(raster_dg{i})
@@ -91,7 +95,7 @@ for i = 1:n
 end
 
 
-delta_p = 4; % choose which params to use to calculate prefer direction indices 
+delta_p = 4; % choose which params to use to calculate prefer direction indices
 MAG_all_norm_dg = cell(n, 1);
 max_r = cell(n, 1);
 norm_max_r = cell(n, 1);
@@ -107,9 +111,9 @@ for i = 1:n
 end
 
 ll = {'NDF4', 'NDF3', 'NDF2', 'NDF1', 'NDF0'};
+[DG_cut, raster_dg_cut, raster_p_sum_cut] = cut_dg(DG, raster_dg, raster_p_sum, 2, [4 5]);
 
 %% plot cell summary
-[DG_cut, raster_dg_cut, raster_p_sum_cut] = cut_dg(DG, raster_dg, raster_p_sum, 2, [4 5]);
 
 for cc = 73:73 %length(ds_id)
     plot_ds_raster(DG_cut, raster_dg_cut, cc, ds_id(cc), ll, 2, 3, 0)
@@ -886,7 +890,7 @@ end
 
 
 %% frequency doubling of moving bar response
-
+color = 'brgkm';
 % get spike histgram of preferred direction
 bin_size = 0.2;
 for i = 1:n
@@ -909,10 +913,10 @@ end
 %plot
 % x = [4 4 4 4]; y = [4 4 5 5];
 x = [2 3 2]; y = [2 3 3];
-for bw = 1:1
+for bw = 3:3
     for t = 1:1
-        for cl = 1:1
-            for ct = 1:4
+        for cl = 2:2
+            for ct = 1:3
                 figure
                 set(gcf, 'Position', [1,1,1080,1080])
                 for cc = 1:length(idx_dir_on{ct})
@@ -1408,3 +1412,254 @@ for i = [2 5]
 end
 %% save ei movie
 save_ei_movie(datadg{5}, 873, '/Users/xyao/Desktop/cell873', 'frames', [10:20])
+
+%% cross correlation
+duration = 3600;
+bin_size = 0.0005;
+max_lag = 40;
+xx = -max_lag*bin_size:bin_size:max_lag*bin_size;
+for c1 = 1:length(id_dir{4})
+    FigHandle = figure;
+    set(FigHandle, 'Position', [1 1 2000 2000])
+    for c2 = 1:length(id_dir{4})
+        if c1 ~= c2
+            id1 = id_dir{4}(c1);
+            id2 = id_dir{4}(c2);
+            idx1 = get_cell_indices(datawn, id1);
+            idx2 = get_cell_indices(datawn, id2);
+            spikes1 = datawn.spikes{idx1};
+            spikes1_TF= ceil(spikes1/bin_size);
+            spikes1 = zeros(duration/bin_size, 1);
+            spikes1(spikes1_TF) = 1;
+            
+            spikes2 = datawn.spikes{idx2};
+            spikes2_TF= ceil(spikes2/bin_size);
+            spikes2 = zeros(duration/bin_size, 1);
+            spikes2(spikes2_TF) = 1;
+            
+            A = xcov(spikes1, spikes2, max_lag, 'coeff');
+            subplot(4, 4, c2)
+            bar(xx, A)
+            title([num2str(id1) '  ' num2str(id2)])
+            xlim([-0.02 0.02])
+
+%             pause
+        end
+    end
+    print_close(1, [24 12], num2str(c1));
+end
+
+
+%% neighboring pairs
+pos = datawn.ei.position;
+mode = 'neg';
+neighbors = [];
+for cc1 = 1:length(id_dir{4})
+    for cc2 = cc1+1:length(id_dir{4})
+        id1 = id_dir{4}(cc1);
+        idx1 = get_cell_indices(datawn, id1);
+        ei1 = datawn.ei.eis{idx1};
+        com1 = ei_com_xy(ei1, pos, 30*3, mode);
+        id2 = id_dir{4}(cc2);
+        idx2 = get_cell_indices(datawn, id2);
+        ei2 = datawn.ei.eis{idx2};
+        com2 = ei_com_xy(ei2, pos, 30*3, mode);
+        if pdist([com1;com2]) < 150
+            neighbors = [neighbors; id1 id2];
+        end
+    end
+end
+
+coms = [];
+for cc = 1:length(id_dir{4})
+    id = id_dir{4}(cc);
+    idx = get_cell_indices(datawn, id);
+    ei = datawn.ei.eis{idx};
+    com = ei_com_xy(ei, pos, 30*3, mode);
+    coms = [coms; com];
+end
+
+figure
+for cc = 1:length(id_dir{4})
+    plot(coms(cc, 1), coms(cc, 2),'ko')
+    hold on
+%     text(coms(cc, 1)+5, coms(cc, 2)+5, num2str(id_dir{1}(cc)), 'FontSize', 10)
+    
+end
+for cp = 1:size(corr_cells)
+    idx1 = find(id_dir{4} == corr_cells(cp, 1));
+    idx2 = find(id_dir{4} == corr_cells(cp, 2));
+    plot([coms(idx1, 1), coms(idx2, 1)], [coms(idx1, 2), coms(idx2, 2)], 'k');
+end
+%% fit direction tuning curves
+T = 1;
+for dir = 1:4
+    figure
+    for i = 1:5
+        CC = 1;
+        for cc = 1:length(id_dir{dir})
+            xdata = DG_cut{i}.theta{1}(idx_dir{dir}(cc), :);
+            ydata = circshift(DG_cut{i}.rho{T}(idx_dir{dir}(cc), :), -2, 2);
+            if ~(dg_idx(idx_dir{dir}(cc), i)) && sum(ydata) ~= 0
+                [f, g] = fit_cos(xdata, ydata);
+                Ymax{dir}{i}(CC) = f.ymax;
+                Phi{dir}{i}(CC) = f.phi;
+                Alpha{dir}{i}(CC) = f.alpha;
+                Width{dir}{i}(CC) = acos(2*0.5^(1/f.alpha) - 1)/pi*360;
+                B{dir}{i}(CC) = f.b;
+                CC = CC + 1;
+                
+                xfit = linspace(0, 2*pi, 100);
+                yfit = f.ymax.*(0.5+0.5*cos(xfit+f.phi)).^f.alpha+f.b;
+                subplot(4, 6, cc)
+                plot(xdata, ydata, 'b')
+                hold on
+                plot(xfit, yfit, 'r')
+                ylim([0 1.1])
+                width = acos(2 * (0.5.^(1/f.alpha) - 0.5))/pi*360;
+                title(['width = ', num2str(width)])
+
+
+            end
+        end
+        Ymax_mean(dir, i) = robust_mean(Ymax{dir}{i});
+        Phi_mean(dir, i) = robust_mean(Phi{dir}{i});
+        Alpha_mean(dir, i) = robust_mean(Alpha{dir}{i});
+        B_mean(dir, i) = robust_mean(B{dir}{i});
+    end
+end
+
+
+for dir = 1:4
+    figure
+
+    for i = 1:5
+        subplot(2, 3, i)
+        hist(Width{dir}{i})
+        title(num2str(mean(Width{dir}{i})))
+    end
+end
+
+for i = 1:5
+    for dir = 1:4
+        WidthMean(dir, i) = mean(Width{dir}{i});
+        WidthSte(dir, i) = std(Width{dir}{i})/sqrt(length(Width{dir}{i}));
+    end
+end
+
+marker = 'xosd';
+figure
+for dir = 1:4
+    errorbar(0:4, WidthMean(dir, :), WidthSte(dir, :), 'Color', 'k', 'Marker', marker(dir), 'MarkerSize', 10)
+    hold on
+end
+legend('superior', 'anterior', 'inferior', 'posterior')
+ylim([0 300])
+xlabel('light level')
+ylabel('tuning width (degree)')
+xlim([-0.5 4.5])
+
+%% plot sta
+figure
+plot_rf(datawn, 6857);
+figure
+plot_rf(datawn, 7759);
+figure
+plot_rf(datawn, 5956);
+
+%% SNR
+ctr = 1;
+color = 'brgk';
+for ll = 1:5;
+    rep = datamb{ll}.stimulus.repetitions;
+    for ct = 1:4
+        [SpikeN_temp{ct}, SpikeN_mean_temp{ct}, SpikeN_std_temp{ct}] = deal(cell(length(id_dir{ct}), 1));
+        for cc = 1:length(id_dir{ct})
+            raster_temp = raster_mb{ll}{idx_dir{ct}(cc)};
+            if ~isempty(raster_temp)
+                SpikeN_temp{ct}{cc} = squeeze(cellfun('length',raster_temp(1,ctr,:,:)));
+                SpikeN_mean_temp{ct}{cc} = mean(SpikeN_temp{ct}{cc},2);
+                SpikeN_std_temp{ct}{cc} = std(SpikeN_temp{ct}{cc},[],2);
+            end
+        end
+    end
+    SpikeN{ll} = SpikeN_temp;
+    SpikeN_mean{ll} = SpikeN_mean_temp;
+    SpikeN_std{ll} = SpikeN_std_temp;
+end
+
+clear SpikeN_mean_all SpikeN_std_all
+for ll = 1:5
+    SpikeN_mean_all(:, ll) = cat(1,SpikeN_mean{ll}{:});
+    SpikeN_std_all(:, ll) = cat(1,SpikeN_std{ll}{:});
+end
+SpikeN_mean_all(any(cellfun(@isempty, SpikeN_mean_all), 2), :) = [];
+SpikeN_std_all(any(cellfun(@isempty, SpikeN_std_all), 2), :) = [];
+
+[rmax, i] = cellfun(@max, SpikeN_mean_all);
+for ll = 1:5
+    for cc = 1:size(SpikeN_mean_all, 1)
+        stdmax(cc, ll) = SpikeN_std_all{cc, ll}(i(cc, ll));
+    end
+end
+
+SNRmax = rmax./stdmax;
+SNRmax = exciseRows_empty(SNRmax);
+
+figure
+plot(SNRmax(:, 1), SNRmax(:, 5), 'ko')
+hold on
+plot([0 15], [0 15], 'k--')
+errorbar(mean(SNRmax(:, 1)), mean(SNRmax(:, 5)), std(SNRmax(:, 5)/sqrt(size(SNRmax, 1))), 'ro')
+herrorbar(mean(SNRmax(:, 1)), mean(SNRmax(:, 5)), std(SNRmax(:, 1)/sqrt(size(SNRmax, 1))), 'ro')
+
+% xlim([0 8])
+% ylim([0 8])
+xlabel('low light level SNR')
+ylabel('high light level SNR')
+
+
+%% subtract bgnd firing
+% estimate background activity
+n = 5;
+interval = 1;
+raster_interval_dg = deal(cell(n, 1));
+for i = 1:n    
+    raster_interval_dg{i} = get_ds_interval_raster(datadg{i}, ds_id, interval);
+    for j = 1:length(raster_interval_dg{i})
+        if iscell(raster_interval_dg{i}{j})
+            bgfr{i}(j) = mean(cellfun(@length, raster_interval_dg{i}{j}))/interval;
+        end
+    end
+    for dir = 1:4
+        bgfr_ct{i}{dir} = [];
+        for cc = 1:length(idx_dir{dir})
+            if ~dg_idx(idx_dir{dir}(cc), i) && sum(DG_cut{i}.rho{1}(idx_dir{dir}(cc), :))>0
+                bgfr_ct{i}{dir} = [bgfr_ct{i}{dir} bgfr{i}(idx_dir{dir}(cc))];
+            end
+        end
+        bgfr_ct_mean(i, dir) = mean(bgfr_ct{i}{dir});
+        bgfr_ct_ste(i, dir) = std(bgfr_ct{i}{dir})/sqrt(length(bgfr_ct{i}{dir}));
+    end
+end
+
+celltype = {'posterior', 'inferior', 'anterior', 'superior'};marker = 'xosd';
+figure
+for i = 1:4
+    errorbar([0:4], bgfr_ct_mean(:, i), bgfr_ct_ste(:, i), 'Color', 'k', 'Marker', marker(i), 'MarkerSize', 10);
+    hold on
+end
+xlim([-0.5 4.5])
+xlabel('R*/rod/s')
+ylabel('background firing (Hz)')
+legend(celltype)
+
+n = 5;
+% spike count
+DG_bgnd = cell(n, 1);
+for i = 1:n    
+    [NumSpikesCell, MaxRate, StimComb] = get_spikescellstim(datadg{i},ds_id,0, 0.05);
+    DG_bgnd{i} = sort_direction(dscellanalysis_bgnd_subtract(NumSpikesCell, StimComb, bgfr{i}));
+end
+[DG_bgnd_cut, ~, ~] = cut_dg(DG_bgnd, raster_dg, raster_p_sum, 2, [4 5]);
+

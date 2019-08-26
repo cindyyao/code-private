@@ -14,8 +14,8 @@ for time = 1:tpn
     FigHandle = figure;
 %     set(FigHandle, 'Position', [1 1 1400 600])
 %     set(FigHandle, 'Position', [1 1 2000 1080])
-%     set(FigHandle, 'Position', [1 1 1080 1080])
-    set(FigHandle, 'Position', [1 1 2000 1080])
+    set(FigHandle, 'Position', [1 1 1980 800])
+%     set(FigHandle, 'Position', [1 1 2000 2000])
     for j = 1:length(MB)
         for ctr = 1:size(MB{j}.rho, 3)
             if ~isempty(raster{j}{cell_idx}) && time <= length(MB{j}.rho)

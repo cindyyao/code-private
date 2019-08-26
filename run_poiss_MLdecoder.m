@@ -50,6 +50,7 @@ for dir = 1:length(THETA)
         output = input.*gain + r_base;
         for i = 1:length(output)
             output(i) = random('poiss', output(i));
+%             output(i) = random('bino', round(2*output(i)), 0.9);
         end
 
         output_r = repmat(output, length(THETA), 1);

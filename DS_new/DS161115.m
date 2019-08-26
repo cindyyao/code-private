@@ -1,10 +1,10 @@
 %% load data
 cd /Users/xyao/matlab/code-private/DS_new/
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
-
+path = '/Volumes/dusom_fieldlab/All_Staff/lab/Experiments/Array/Analysis/2016-11-15-0/';
 % load drifting grating data
-datadg = load_data('/Volumes/lab/analysis/2016-11-15-0/data007-sorted/data007-sorted', opt);
-datadg.names.stimulus_path = '/Volumes/lab/analysis/2016-11-15-0/stimuli/s07.txt';
+datadg = load_data(strcat(path, 'data007-sorted/data007-sorted'), opt);
+datadg.names.stimulus_path = strcat(path, 'stimuli/s07.txt');
 datadg = load_stim(datadg, 'user_defined_trigger_interval', 10);
 
 % identify DS cells
@@ -19,24 +19,24 @@ params_idx = [4 5]; % which parameters to use for classification
 ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
 
 
-datafs{1} = load_data('/Volumes/lab/analysis/2016-11-15-0/data001-map/data001-map', opt);
-datafs{1}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-15-0/stimuli/s01.mat';
+datafs{1} = load_data(strcat(path, 'data001-map/data001-map'), opt);
+datafs{1}.names.stimulus_path = strcat(path, 'stimuli/s01.mat');
 datafs{1} = load_stim_mfs(datafs{1});
 
-datafs{2} = load_data('/Volumes/lab/analysis/2016-11-15-0/data002-map/data002-map', opt);
-datafs{2}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-15-0/stimuli/s02.mat';
+datafs{2} = load_data(strcat(path, 'data002-map/data002-map'), opt);
+datafs{2}.names.stimulus_path = strcat(path, 'stimuli/s02.mat');
 datafs{2} = load_stim_mfs(datafs{2});
 
-datafs{3} = load_data('/Volumes/lab/analysis/2016-11-15-0/data004-map/data004-map', opt);
-datafs{3}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-15-0/stimuli/s04.mat';
+datafs{3} = load_data(strcat(path, 'data004-map/data004-map'), opt);
+datafs{3}.names.stimulus_path = strcat(path, 'stimuli/s04.mat');
 datafs{3} = load_stim_mfs(datafs{3});
 
-datafs{4} = load_data('/Volumes/lab/analysis/2016-11-15-0/data005-map/data005-map', opt);
-datafs{4}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-15-0/stimuli/s05.mat';
+datafs{4} = load_data(strcat(path, 'data005-map/data005-map'), opt);
+datafs{4}.names.stimulus_path = strcat(path, 'stimuli/s05.mat');
 datafs{4} = load_stim_mfs(datafs{4});
 
-datafs{5} = load_data('/Volumes/lab/analysis/2016-11-15-0/data008-map/data008-map', opt);
-datafs{5}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-15-0/stimuli/s08.mat';
+datafs{5} = load_data(strcat(path, 'data008-map/data008-map'), opt);
+datafs{5}.names.stimulus_path = strcat(path, 'stimuli/s08.mat');
 datafs{5} = load_stim_mfs(datafs{5});
 
 load('DS161115.mat')
@@ -388,7 +388,7 @@ for ll = 1:5
                 if ~fs_idx_onoff{onoff}(idx_dir{dir}(cc), ll)
                     data = rf_all_center{ll}{idx_dir{dir}(cc)}(:, :, onoff);
 %                     data = rf_wt{ll}{dir}{cc}{onoff};
-                    if sum(sum(data > mean(data(:))+3*std(data(:))))>0
+                    if sum(sum(data > mean(data(:))+2*std(data(:))))>0
 %                         figure(100)
 %                         imagesc(data)
 %                         colormap gray
@@ -411,7 +411,7 @@ end
 
 
 % exclude outliers
-stdn = 2;
+stdn = 10;
 for ll = 1:5
     for dir = 1:3
         for onoff = 1:2

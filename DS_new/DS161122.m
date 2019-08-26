@@ -1,12 +1,12 @@
 %% load data
 cd /Users/xyao/matlab/code-private/DS_new/
 opt = struct('load_params', 1,'load_neurons', 1);%, 'load_ei', 1);
-
+path = '/Volumes/dusom_fieldlab/All_Staff/lab/Experiments/Array/Analysis/2016-11-22-0/';
 % load drifting grating data
-datadg = load_data('/Volumes/lab/analysis/2016-11-22-0/data007-sorted/data007-sorted', opt);
-datadg.names.stimulus_path = '/Volumes/lab/analysis/2016-11-22-0/stimuli/s07.txt';
+datadg = load_data(strcat(path, 'data007-sorted/data007-sorted'), opt);
+datadg.names.stimulus_path = strcat(path, 'stimuli/s07.txt');
 datadg = load_stim(datadg, 'user_defined_trigger_interval', 10);
-
+datadg = load_ei(datadg, ds_id, 'array_type', 519);
 % identify DS cells
 [NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg,datadg.cell_ids,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
@@ -17,20 +17,20 @@ params_idx = [2 3]; % which parameters to use for classification
 [NumSpikesCell, ~, StimComb] = get_spikescellstim(datadg,ds_id,0,1);
 ds_struct = dscellanalysis(NumSpikesCell, StimComb,datadg);
 
-datafs{1} = load_data('/Volumes/lab/analysis/2016-11-22-0/data000-map/data000-map', opt);
-datafs{1}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-22-0/stimuli/s00.mat';
+datafs{1} = load_data(strcat(path, 'data000-map/data000-map'), opt);
+datafs{1}.names.stimulus_path = strcat(path, 'stimuli/s00.mat');
 datafs{1} = load_stim_mfs(datafs{1});
-datafs{2} = load_data('/Volumes/lab/analysis/2016-11-22-0/data001-map/data001-map', opt);
-datafs{2}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-22-0/stimuli/s01.mat';
+datafs{2} = load_data(strcat(path, 'data001-map/data001-map'), opt);
+datafs{2}.names.stimulus_path = strcat(path, 'stimuli/s01.mat');
 datafs{2} = load_stim_mfs(datafs{2});
-datafs{3} = load_data('/Volumes/lab/analysis/2016-11-22-0/data002-map/data002-map', opt);
-datafs{3}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-22-0/stimuli/s02.mat';
+datafs{3} = load_data(strcat(path, 'data002-map/data002-map'), opt);
+datafs{3}.names.stimulus_path = strcat(path, 'stimuli/s02.mat');
 datafs{3} = load_stim_mfs(datafs{3});
-datafs{4} = load_data('/Volumes/lab/analysis/2016-11-22-0/data003-map/data003-map', opt);
-datafs{4}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-22-0/stimuli/s03.mat';
+datafs{4} = load_data(strcat(path, 'data003-map/data003-map'), opt);
+datafs{4}.names.stimulus_path = strcat(path, 'stimuli/s03.mat');
 datafs{4} = load_stim_mfs(datafs{4});
-datafs{5} = load_data('/Volumes/lab/analysis/2016-11-22-0/data006-map/data006-map', opt);
-datafs{5}.names.stimulus_path = '/Volumes/lab/analysis/2016-11-22-0/stimuli/s06.mat';
+datafs{5} = load_data(strcat(path, 'data006-map/data006-map'), opt);
+datafs{5}.names.stimulus_path = strcat(path, 'stimuli/s06.mat');
 datafs{5} = load_stim_mfs(datafs{5});
 
 load('DS161122.mat')
@@ -169,6 +169,7 @@ bin_size = 0.02;
 xx = [bin_size/2:bin_size:2-bin_size/2];
 XX = [bin_size/2:bin_size:1-bin_size/2];
 for ll = 1:5
+    histg_onoff{ll} = cell(length(ds_id), 1);
     for cc = 1:length(raster_onoff{ll})
         if ~isempty(raster_onoff{ll}{cc})
             for p = 1:289%size(raster_onoff{ll}{1}, 1)
@@ -212,7 +213,7 @@ for cc = 2:2%length(ds_id)
 %     pause 
 %     close all
         name = [num2str(ds_id(cc)) '_' LL{ll}];
-        print_close(1, [14 14], name);
+%         print_close(1, [14 14], name);
     end
 end
 
@@ -274,12 +275,16 @@ PixelArea = (30*4)^2/10^6;
 for ll = 1:5
     for dir = 1:4
         clear rf_area_temp
-        for onoff = 1:2
+        for onoff = 1:3
             rf_area_temp = [];
+%             rf_center_temp = [];
             for cc = 1:length(id_dir{dir})
                 if ~fs_idx(idx_dir{dir}(cc), ll)
-                    data = rf_all{ll}{idx_dir{dir}(cc)}(:, :, onoff);
-%                     data = rf_wt{ll}{dir}{cc}{onoff};
+                    if onoff < 3
+                        data = rf_all{ll}{idx_dir{dir}(cc)}(:, :, onoff);
+                    else
+                        data = sum(rf_all{ll}{idx_dir{dir}(cc)}, 3);
+                    end
                     if sum(sum(data > mean(data(:))+5*std(data(:))))>0
 %                         figure(100)
 %                         imagesc(data)
@@ -289,9 +294,11 @@ for ll = 1:5
                         params = fit_2d_gaussian(data);
     %                     Gaussian_params{ll}{dir}{cc}{onoff} = params;
                         rf_area_temp = [rf_area_temp params.xd * params.yd * pi * PixelArea];
+                        params_all{ll}{dir}{onoff}{cc} = params;
                     end
                 end
             end
+            
             rf_area{ll}{dir}{onoff} = rf_area_temp;
         end
     end
@@ -377,7 +384,31 @@ for onoff = 1:2
 
 end
 
+%% mosaic
+ll = 5;
+PIXSIZE = 30;
 
+color = 'brk';
+figure
+for ct = 1:4
+    subplot(2, 2, ct)
+    for cc = 1:length(params_all{ll}{ct}{onoff})
+        for onoff = 3:3
+            if ~isempty(params_all{ll}{ct}{onoff}{cc})
+                params = params_all{ll}{ct}{onoff}{cc};
+                drawEllipse(params.x0*PIXSIZE, params.y0*PIXSIZE, params.xd*PIXSIZE, params.yd*PIXSIZE, params.angle, 'color', color(onoff))
+                hold on
+            end
+            if ct == 2 && cc == 23
+                drawEllipse(params.x0*PIXSIZE, params.y0*PIXSIZE, params.xd*PIXSIZE, params.yd*PIXSIZE, params.angle, 'color', 'r')
+            end
+        end
+    end
+    xlim([100, 500])
+    ylim([100, 500])
+    daspect([1 1 1])
+%     legend('ON', 'OFF', 'ALL')
+end
 %%
 dir = 4;
 onoff = 1;
@@ -433,4 +464,260 @@ end
 
 anova1(y, group)
 
+%% neighboring pairs
+pos = datadg.ei.position;
+mode = 'neg';
+neighbors = [];
+ct = 1;
+for cc1 = 1:length(id_dir{ct})
+    for cc2 = cc1+1:length(id_dir{ct})
+        id1 = id_dir{ct}(cc1);
+        idx1 = get_cell_indices(datadg, id1);
+        ei1 = datadg.ei.eis{idx1};
+        com1 = ei_com_xy(ei1, pos, 30*3, mode);
+        id2 = id_dir{ct}(cc2);
+        idx2 = get_cell_indices(datadg, id2);
+        ei2 = datadg.ei.eis{idx2};
+        com2 = ei_com_xy(ei2, pos, 30*3, mode);
+        if pdist([com1;com2]) < 150
+            neighbors = [neighbors; id1 id2];
+        end
+    end
+end
+
+ct = 4;
+celltype = {'superior', 'anterior', 'inferior', 'posterior'};
+coms = [];
+for cc = 1:length(id_dir{ct})
+    id = id_dir{ct}(cc);
+    idx = get_cell_indices(datadg, id);
+    ei = datadg.ei.eis{idx};
+    com = ei_com_xy(ei, pos, 30*3, mode);
+    coms = [coms; com];
+end
+
+corner_i = [4 126 195 264 386 455 4];
+corner_position = datadg.ei.position(corner_i, :);
+figure
+for cc = 1:length(id_dir{ct})
+    plot(coms(cc, 1), coms(cc, 2),'ko')
+    hold on
+%     text(coms(cc, 1)+5, coms(cc, 2)+5, num2str(id_dir{1}(cc)), 'FontSize', 10)
+    
+end
+
 %%
+duration = 3000;
+bin_size = 0.0005;
+max_lag = 20;
+ct = 1;
+N = 10000;
+ll = {'NDF 4', 'NDF 3', 'NDF 2', 'NDF 1', 'NDF 0'};
+xx = -max_lag*bin_size:bin_size:max_lag*bin_size;
+peak = zeros(size(neighbors, 1), 5);
+for cp = 1:size(neighbors, 1)
+    if mod(cp, 5) == 1
+        FigHandle = figure;
+        set(FigHandle, 'Position', [1 1 2000 2000])
+        fig_i = 1;
+    end
+    id1 = neighbors(cp, 1);
+    id2 = neighbors(cp, 2);
+    for i = 1:5
+        if ~fs_idx(find(ds_id == id1), i)
+            idx1 = get_cell_indices(datafs{i}, id1);
+            idx2 = get_cell_indices(datafs{i}, id2);
+            spikes1 = datafs{i}.spikes{idx1};
+            spikes1_TF= ceil(spikes1/bin_size);
+            spikes1 = zeros(duration/bin_size, 1);
+            spikes1(spikes1_TF) = 1;
+
+            spikes2 = datafs{i}.spikes{idx2};
+            spikes2_TF= ceil(spikes2/bin_size);
+            spikes2 = zeros(duration/bin_size, 1);
+            spikes2(spikes2_TF) = 1;
+
+            A = xcorr(spikes1, spikes2, max_lag, 'coeff');
+            peak(cp, i) = max(A);
+% %     A = xcorr(spikes1, spikes2, max_lag);
+%     [h, filteredA] = find_smallest_h(A);
+%     [bootstat,bootsam] = bootstrp(N,@find_smallest_h_hist,rude(round(filteredA), 1:max_lag*2+1), max_lag);
+%     p = sum(bootstat > h)/N;
+            subplot(5, 5, (fig_i-1)*5+i)
+%     if p < 0.01
+%         bar(xx, A, 'r')
+%     else
+            bar(xx, A, 'b')
+%     end
+            if fig_i == 1
+                title(ll{i})
+            end
+            xlim([-0.01 0.01])
+        end
+    end
+    fig_i = fig_i + 1;
+end
+
+figure
+for i = 1:size(peak, 1)
+    plot([1 10 100 1000 10000], peak(i, :))
+    hold on
+end
+set(gca, 'xscale', 'log')
+xlabel('R*/rod/s')
+ylabel('correlation coefficient')
+
+%% compare responses to center flash between on-off and on DSGC
+ll = 1;
+CC = 1;
+
+for ct = 1:3
+    for cc = 1:length(id_dir_on{ct})
+        [~, argmax] = max(cellfun(@max, histg_onoff{ll}{idx_dir_on{ct}(cc)}));
+        hist_on(CC, :) = histg_onoff{ll}{idx_dir_on{ct}(cc)}{argmax};
+        CC = CC+1;
+    end
+end
+
+CC = 1;
+
+for ct = 1:4
+    for cc = 1:length(id_dir{ct})
+        if ~isempty(histg_onoff{ll}{idx_dir{ct}(cc)})
+            [~, argmax] = max(cellfun(@max, histg_onoff{ll}{idx_dir{ct}(cc)}));
+            hist_oo(CC, :) = histg_onoff{ll}{idx_dir{ct}(cc)}{argmax};
+            CC = CC+1;
+        end
+    end
+end
+
+repeat = 5;
+hist_on = hist_on/repeat/bin_size;
+hist_oo = hist_oo/repeat/bin_size;
+
+xx = [bin_size/2:bin_size:2-bin_size/2];
+figure
+shadedplot(xx, mean(hist_oo)+std(hist_oo)/sqrt(size(hist_oo, 1)), mean(hist_oo)-std(hist_oo)/sqrt(size(hist_oo, 1)), 'k', 'k');
+hold on
+plot(xx, mean(hist_oo), 'k')
+shadedplot(xx, mean(hist_on)+std(hist_on)/sqrt(size(hist_on, 1)), mean(hist_on)-std(hist_on)/sqrt(size(hist_on, 1)), 'r', 'r');
+hold on
+plot(xx, mean(hist_on), 'r')
+
+xlabel('time (second)')
+ylabel('firing rate (Hz)')
+legend('ON-OFF', 'ON')
+
+
+xx = [bin_size/2:bin_size:2-bin_size/2];
+figure
+shadedplot(xx, mean(hist_oo)+std(hist_oo), mean(hist_oo)-std(hist_oo), 'k', 'k');
+hold on
+plot(xx, mean(hist_oo), 'k')
+shadedplot(xx, mean(hist_on)+std(hist_on), mean(hist_on)-std(hist_on), 'r', 'r');
+hold on
+plot(xx, mean(hist_on), 'r')
+
+xlabel('time (second)')
+ylabel('firing rate (Hz)')
+legend('ON-OFF', 'ON')
+
+
+%% compare responses to center flash between superior on-off and others
+repeat = 5;
+LL = {'NDF 4', 'NDF 3', 'NDF 2', 'NDF 1', 'NDF 0'};
+clear hist_oo_ct
+
+c = [bin_size/2:bin_size:2-bin_size/2];
+figure
+for ll = 1:5
+    for ct = 1:4
+        CC = 1;
+        for cc = 1:length(id_dir{ct})
+            if ~isempty(histg_onoff{ll}{idx_dir{ct}(cc)})
+                [~, argmax] = max(cellfun(@max, histg_onoff{ll}{idx_dir{ct}(cc)}));
+                hist_oo_ct{ll, ct}(CC, :) = histg_onoff{ll}{idx_dir{ct}(cc)}{argmax}/repeat/bin_size;
+                CC = CC + 1;
+            end
+        end
+    end
+    subplot(5,1,ll)
+    for ct = 1:4
+        plot(xx, mean(hist_oo_ct{ll, ct}))
+        hold on
+    end
+    title(LL{ll})
+    ylabel('firing rate (Hz)')
+    if ll == 1
+        legend('superior', 'anterior', 'inferior', 'posterior')
+    end
+    if ll == 5
+        xlabel('time (s)')
+    end
+end
+
+figure
+for ll = 1:5
+    hist_oo_ct_combine{ll, 1} = hist_oo_ct{ll, 1};
+    hist_oo_ct_combine{ll, 2} = cell2mat(hist_oo_ct(ll, 2:4)');
+    subplot(5,1,ll)
+    for ct = 1:2
+        plot(xx, mean(hist_oo_ct_combine{ll, ct}))
+        hold on
+    end
+    title(LL{ll})
+    ylabel('firing rate (Hz)')
+    if ll == 1
+        legend('superior', 'others')
+    end
+    if ll == 5
+        xlabel('time (s)')
+    end
+end
+
+
+% mean spike number
+center_gain = cellfun(@sum, cellfun(@mean, hist_oo_ct(1, :), 'UniformOutput', 0));
+%% fit RF with Gaussian                
+PixelArea = (30*4)^2/10^6;
+% fit and compute rf area
+for ll = 1:5
+    for dir = 1:4
+        rf_area_temp = [];
+        for cc = 1:length(id_dir{dir})
+            if ~fs_idx(idx_dir{dir}(cc), ll)
+                data = sum(rf_all{ll}{idx_dir{dir}(cc)}, 3);
+                if sum(sum(data > mean(data(:))+5*std(data(:))))>0
+                    params = fit_2d_gaussian(data);
+                    rf_area_temp = [rf_area_temp params.xd * params.yd * pi * PixelArea];
+                end
+            end
+        end
+        rf_area_all{ll}{dir} = rf_area_temp;
+    end
+end
+
+
+% exclude outliers
+stdn = 2;
+for ll = 1:5
+    for dir = 1:4
+        notdone = 1;
+        rf_area_temp = rf_area_all{ll}{dir};
+        while notdone
+            a = length(rf_area_temp);
+            rf_area_temp(rf_area_temp > std(rf_area_temp)*stdn + mean(rf_area_temp)) = [];
+            b = length(rf_area_temp);
+            if a == b
+                notdone = 0;
+                rf_area_all_clean{ll}{dir} = rf_area_temp;
+            end
+        end
+        rf_area_all_clean_mean(ll, dir) = mean(rf_area_all_clean{ll}{dir});
+        rf_area_all_clean_ste(ll, dir) = std(rf_area_all_clean{ll}{dir})/sqrt(length(rf_area_all_clean{ll}{dir}));
+
+    end
+end
+
+area_type = rf_area_all_clean_mean(1, :);
+load('DS160324.mat', 'xthreshold')

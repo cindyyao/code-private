@@ -71,7 +71,7 @@ robust_idx = get_cell_indices(datawn, robust_id);
 
 frame = datawn.ei.nrPoints + datawn.ei.nlPoints + 1;
 elec = size(datawn.ei.position, 1);
-distance = 1;
+distance = 3;
 center_ei = zeros(length(robust_id),2);
 stixel_size_ = datawn.stimulus.stixel_width;
 for i = 1:length(robust_id)
