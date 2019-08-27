@@ -1,4 +1,5 @@
-**/*.mat
-**/*.fig
-**/*.pdf
-**/*.mov
+*.mat
+*.fig
+*.pdf
+*.mov
+*.m~
